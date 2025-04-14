@@ -13,12 +13,27 @@ app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
     console.log("GET /")
-    res.render("index");
+    res.render("pages/index");
 })
 
 app.get("/sobre", (req, res) => {
     console.log("GET /sobre")
-    res.render("sobre");
+    res.render("pages/sobre");
+})
+
+app.get("/login", (req, res) => {
+    console.log("GET /login")
+    res.render("pages/login");
+})
+
+app.get("/cadastro", (req, res) => {
+    console.log("GET /cadastro")
+    res.render("pages/cadastro");
+})
+
+app.get("/dashboard", (req, res) => {
+    console.log("GET /dashboard")
+    res.render("pages/dashboard");
 })
 
 app.listen(PORT, () => {
