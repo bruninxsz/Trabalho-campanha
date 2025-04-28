@@ -40,3 +40,5 @@ app.listen(PORT, () => {
     console.log(`Servidor sendo excexutado na porta ${PORT}`)
     console.log(__dirname + "\\static")
 });
+
+
