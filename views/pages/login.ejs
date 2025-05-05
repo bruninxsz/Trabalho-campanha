@@ -7,13 +7,15 @@
     <br>
     <center>
         <h1>FAZER LOGIN</h1>
+        <main>
+            <form action="/login" method="post" class="formItens">
         <table>
             <tr>
                 <td>
                     Login:
                 </td>
                 <td>
-                    <input type="text" name="" id="">
+                    <input type="text" name="username" id="username" placeholder="Digite seu nome de usuário">
                 </td>
             </tr>
             <tr>
@@ -21,17 +23,19 @@
                     Senha:
                 </td>
                 <td>
-                    <input type="text" name="" id="">
+                    <input type="password" name="password" id="password" placeholder="Digite sua senha">
                 </td>
             </tr>
         </table>
 
         <br>
         <br>
-        <a href="/"><button>ENTRAR</button></a>
-        <br><br>
+        <button type="submit" id="btnEntrar">ENTRAR</button>
+            </form>
+        </main>
     </center>
-    <a href="./cadastro">Não Tenho Login</a>
+    <br><br>
+    <a id="cadastrar" href="./cadastro">Não Tenho Login</a>
 
     <%- include("../partials/footer") %>
 </body>

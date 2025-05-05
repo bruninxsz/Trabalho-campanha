@@ -2,12 +2,24 @@
 const express = require("express");
 const session = require("express-session");
 const sqlite3 = require("sqlite3");
+// const bodyparser = require("body-parser") //Até a versão 4 é necessario usar esse codigo
 
 const app = express(); //Armazena as chamadas e propriedades da biblioteca EXPRESS
 
 const PORT = 8000;
 
+//Conexão com o Banco de Dados
+const db = new sqlite3.Database("users.db");
+db.serialize(() => {
+    db.run(
+        "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
+    )
+});
+
 app.use('/static', express.static(__dirname + '/static'))
+
+//Configuração do Express para processar requisições POST com BODY PARAMETERS
+app.use(express.urlencoded({ extended: true }));// Versão Express >= 5.x.x
 
 app.set('view engine', 'ejs');
 
@@ -26,10 +38,68 @@ app.get("/login", (req, res) => {
     res.render("pages/login");
 })
 
+//Rota /login para processamento dos dados do formulário de LOGIN no cliente
+app.post("/login", (req, res) => {
+
+    console.log("POST /login")
+    console.log(JSON.stringify(req.body));
+    const { username, password } = req.body;
+
+    const query = `SELECT * FROM users WHERE username=? AND password=?`;
+
+    db.get(query, [username, password], (err, row) => {
+        if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+
+        //1. Verificar se o usuário existe
+        console.log(JSON.stringify(row))
+        if (row) {
+            //2. Se o usuário existir e a senha é válida no BD, executar o processo de login
+            res.redirect("/dashboard")
+        } else {
+            //3. Se não, executar processo de negação de login
+            res.send("Usuário Inválido")
+        }
+    })
+    // res.render("pages/login")
+})
+
 app.get("/cadastro", (req, res) => {
     console.log("GET /cadastro")
     res.render("pages/cadastro");
 })
+
+app.post("/cadastro", (req, res) => {
+
+    console.log("POST /cadastro")
+    console.log(JSON.stringify(req.body));
+    const { username, password } = req.body;
+
+    const query1 = `SELECT * FROM users WHERE username=?`;
+    const query2 = `INSERT INTO users (username, password) VALUES (? , ?)`;
+
+    db.get(query1, [username], (err, row) => {
+        if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+
+        //1. Verificar se o usuário existe
+        console.log(JSON.stringify(row))
+        if (row) {
+            //2. Se o usuário existir Negar o Cadastro
+            console.log(`Usuario ${username} já cadastrado`)
+            res.send("Este usuário já existe")
+        } else {
+            //3. Se não, fazer o insert
+            db.get(query2, [username, password], (err, row) => {
+
+                if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+
+                //1. Verificar se o usuário existe
+                console.log(JSON.stringify(row))
+                console.log(`Usuário ${username} cadastrado com sucesso`)
+                res.redirect("/login")
+            })
+        }
+    })
+});
 
 app.get("/dashboard", (req, res) => {
     console.log("GET /dashboard")

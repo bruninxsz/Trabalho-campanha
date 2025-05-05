@@ -45,8 +45,9 @@ table {
     border-style: none;
 }
 
-button:hover {
-    cursor: pointer;
+table tr td{
+    text-align: end;
+    padding-left: 10px;
 }
 
 footer {
@@ -58,4 +59,27 @@ footer {
     bottom: 0;
     position: fixed;
     text-align: center;
+}
+
+#cadastrar{
+    padding: 10px;
+    font-size: 14px;
+}
+
+#VoltarLogin{
+    padding: 10px;
+    font-size: 14px; 
+}
+
+button{ 
+    border: none;
+    padding: 8px;
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(182, 6, 6);
 }

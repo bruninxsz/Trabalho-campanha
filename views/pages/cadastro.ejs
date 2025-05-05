@@ -7,14 +7,15 @@
     <br>
     <center>
         <h1>CADASTRAR</h1>
-        <br>
+        <main>
+            <form action="/cadastro" method="post" class="formItens">
         <table>
             <tr>
                 <td>
-                    Email:
+                    Login:
                 </td>
                 <td>
-                    <input type="text" name="" id="">
+                    <input type="text" name="username" id="username" placeholder="Digite seu nome de usuário">
                 </td>
             </tr>
             <tr>
@@ -22,21 +23,19 @@
                     Senha:
                 </td>
                 <td>
-                    <input type="text" name="" id="">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Confirmar Senha:
-                </td>
-                <td>
-                    <input type="text" name="" id="">
+                    <input type="password" name="password" id="password" placeholder="Digite sua senha">
                 </td>
             </tr>
         </table>
+
         <br>
-        <a href="./login"><button type="submit" onsubmit="">CADASTRAR</button></a>
+        <br>
+        <button type="submit" id="btnCadastrar">CADASTRAR</button>
+            </form>
+        </main>
     </center>
+    <br><br>
+    <a id="VoltarLogin" href="./login">Voltar ao Login</a>
 
     <%- include("../partials/footer") %>
 </body>
