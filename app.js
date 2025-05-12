@@ -16,6 +16,14 @@ db.serialize(() => {
     )
 });
 
+app.use(
+    session({
+        secret: "senhaforte",
+        resave: true,
+        saveUninitialized: true,
+    })
+)
+
 app.use('/static', express.static(__dirname + '/static'))
 
 //Configuração do Express para processar requisições POST com BODY PARAMETERS
@@ -25,17 +33,27 @@ app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
     console.log("GET /")
-    res.render("pages/index");
+
+    if (req.session.loggedin) {
+    res.render("pages/index", { titulo: "Index" });
+    } else{
+    res.send('Usuário não logado <br> <a href="/login">Fazer Login</a>')
+}
 })
 
 app.get("/sobre", (req, res) => {
     console.log("GET /sobre")
-    res.render("pages/sobre");
+
+    if (req.session.loggedin) {
+    res.render("pages/sobre", { titulo: "Sobre" });
+    } else{
+        res.send('Usuário não logado <br> <a href="/login">Fazer Login</a>')
+    }
 })
 
 app.get("/login", (req, res) => {
     console.log("GET /login")
-    res.render("pages/login");
+    res.render("pages/login", { titulo: "Login" });
 })
 
 //Rota /login para processamento dos dados do formulário de LOGIN no cliente
@@ -54,6 +72,8 @@ app.post("/login", (req, res) => {
         console.log(JSON.stringify(row))
         if (row) {
             //2. Se o usuário existir e a senha é válida no BD, executar o processo de login
+            req.session.username = row.username;
+            req.session.loggedin = true;
             res.redirect("/dashboard")
         } else {
             //3. Se não, executar processo de negação de login
@@ -65,7 +85,7 @@ app.post("/login", (req, res) => {
 
 app.get("/cadastro", (req, res) => {
     console.log("GET /cadastro")
-    res.render("pages/cadastro");
+    res.render("pages/cadastro", { titulo: "Cadastro" });
 })
 
 app.post("/cadastro", (req, res) => {
@@ -103,7 +123,27 @@ app.post("/cadastro", (req, res) => {
 
 app.get("/dashboard", (req, res) => {
     console.log("GET /dashboard")
-    res.render("pages/dashboard");
+
+    if (req.session.loggedin) {
+        //Listar todos os Usuários
+        const query = "SELECT * FROM users"
+        db.all(query, [], (err, row) => {
+            if (err) throw err;
+            // Renderiza a Página dashboard com a lista de usuário coletada no BD
+            res.render("pages/dashboard", { titulo: "Dashboard", dados: row, req: req});
+        })
+    } else{
+        res.send('Usuário não logado <br> <a href="/login">Fazer Login</a>')
+    }
+
+    // res.render("pages/dashboard", {titulo: "Dashboard"});
+})
+
+app.get("/logout", (req, res) => {
+    console.log("GET /logout");
+    req.session.destroy(() => {
+        res.redirect("/login")
+    })
 })
 
 app.listen(PORT, () => {

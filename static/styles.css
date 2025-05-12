@@ -41,11 +41,11 @@ header a:hover {
 }
 
 
-table {
+#tblLogin {
     border-style: none;
 }
 
-table tr td{
+#tblLogin tr td{
     text-align: end;
     padding-left: 10px;
 }
@@ -69,6 +69,16 @@ footer {
 #VoltarLogin{
     padding: 10px;
     font-size: 14px; 
+}
+
+#MainDash *{
+    border: 1px solid;
+    width: 900px;
+}
+
+#MainDash table{
+    text-align: center;
+    border: 3px solid;
 }
 
 button{ 
