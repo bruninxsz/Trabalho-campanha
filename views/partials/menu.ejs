@@ -3,8 +3,14 @@
         <ul>
             <li><a href="/">HOME</a></li>
             <li><a href="/sobre">SOBRE</a></li>
+            <% if(req.session.loggedin) { %>
             <li><a href="/dashboard">DASHBOARD</a></li>
+            <% } else { %>
+                <a href="/login">LOGIN</a> 
+            <% } %>
         </ul>
     </nav>
+    <% if(req.session.loggedin) { %>
     <a href="/logout">Sair da Conta</a>
+    <% } %>
 </header>

@@ -4,9 +4,11 @@
 <%- include("../partials/head") %>
 
 <body>
+    <a href="/"><img src="../../static/voltar.png" width="40px"/ style="margin: 10px;"></a>
     <br>
+    
     <center>
-        <h1>FAZER LOGIN</h1>
+        <h1 id="h1Login">LOGIN</h1>
         <main>
             <form action="/login" method="post" class="formItens">
         <table id="tblLogin">
@@ -27,7 +29,6 @@
                 </td>
             </tr>
         </table>
-
         <br>
         <br>
         <button type="submit" id="btnEntrar">ENTRAR</button>
@@ -35,7 +36,7 @@
         </main>
     </center>
     <br><br>
-    <a id="cadastrar" href="./cadastro">Não Tenho Login</a>
+    <h2><a id="cadastrar" href="./cadastro">Não Tenho Login</a></h2>
 
     <%- include("../partials/footer") %>
 </body>
