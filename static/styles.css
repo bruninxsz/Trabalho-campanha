@@ -64,6 +64,24 @@ input{
     padding-left: 10px;
 }
 
+textarea{
+    font-size: 17px;
+    color: #0d0d8077;
+}
+
+#tblPost {
+    border-style: none;
+}
+
+#tblPost td{
+    font-size: 18px;
+    font-weight: bolder;
+    text-align: start;
+}
+
+#tblPost tr td{
+    padding-left: 10px;
+}
 footer {
     text-align: center;
     background-color: red;

@@ -14,6 +14,9 @@ db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
   );
+  db.run(
+    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_user INTEGER, title TEXT, content TEXT, data_criacao TEXT)"
+  );
 });
 
 app.use(
@@ -61,8 +64,9 @@ app.post("/login", (req, res) => {
     console.log(JSON.stringify(row));
     if (row) {
       //2. Se o usuário existir e a senha é válida no BD, executar o processo de login
-      req.session.username = row.username;
+      req.session.username = username;
       req.session.loggedin = true;
+      req.session.id_username = row.id;
       res.redirect("/dashboard");
     } else {
       //3. Se não, executar processo de negação de login
@@ -72,9 +76,11 @@ app.post("/login", (req, res) => {
   // res.render("pages/login")
 });
 
-app.get ("/user-senha-invalido", (req,res)=>{
-    res.render ("pages/user-senha-invalido", {titulo: "Usuario Senha Invalidos"})
-})
+app.get("/user-senha-invalido", (req, res) => {
+  res.render("pages/user-senha-invalido", {
+    titulo: "Usuario Senha Invalidos",
+  });
+});
 
 app.get("/cadastro", (req, res) => {
   console.log("GET /cadastro");
@@ -112,13 +118,15 @@ app.post("/cadastro", (req, res) => {
   });
 });
 
-app.get ("/usuario-cadastrado", (req,res) =>{
-    res.render ("pages/usuario-cadastrado", {titulo:"Usuario Cadastrado"})
-})
+app.get("/usuario-cadastrado", (req, res) => {
+  res.render("pages/usuario-cadastrado", { titulo: "Usuario Cadastrado" });
+});
 
-app.get ("/usuario-ja-cadastrado", (req,res) =>{
-    res.render ("pages/usuario-ja-cadastrado", {titulo:"Usuario Ja Cadastrado"})
-})
+app.get("/usuario-ja-cadastrado", (req, res) => {
+  res.render("pages/usuario-ja-cadastrado", {
+    titulo: "Usuario Ja Cadastrado",
+  });
+});
 
 app.get("/dashboard", (req, res) => {
   console.log("GET /dashboard");
@@ -139,14 +147,72 @@ app.get("/dashboard", (req, res) => {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
   }
-
-  // res.render("pages/dashboard", {titulo: "Dashboard"});
 });
 
+app.get("/posts", (req, res) => {
+  console.log("GET /posts");
+  const query = "SELECT * FROM posts";
+    db.all(query, [], (err, row) => {
+      if (err) throw err;
+      res.render("pages/posts", {
+        titulo: "Posts",
+        dados: row,
+        req: req,
+      });
+    });
+});
+
+app.get("/novo-post", (req, res) => {
+  if (req.session.loggedin) {
+    console.log("GET /novo-post");
+    res.render("pages/novo-post", { titulo: "Nova Postagem", req: req });
+  } else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }
+});
+
+app.post("/novo-post", (req, res) => {
+  console.log("POST /novo-post");
+  // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
+  //req.session.username, req.session.id
+  if (req.session.loggedin) {
+    const { title, content } = req.body;
+    const query = `INSERT INTO posts (id_user, title, content, data_criacao) VALUES (?, ? , ?, ?)`;
+    const data = new Date();
+    const data_atual = data.toLocaleDateString();
+    console.log("Dados da Postagem: ", req.body);
+    console.log(`UserName: ${req.session.username}, ID: ${req.session.id_username}`);
+    console.log("Data: ", data_atual);
+    db.get(query, [req.session.id_username ,title, content, data_atual], (err, row) => {
+      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+      //1. Verificar se o usuário existe
+      console.log(JSON.stringify(row));
+      res.send("Post Criado <br> <a href='/novo-post'>VOLTAR</a>")
+    });
+
+  } else {
+    res.redirect("/nao-autorizado");
+  }
+});
+
+app.get("/postCompleto/:id", (req, res) => {
+  const postId = req.params.id;
+  const query = "SELECT * FROM posts Where id = ?";
+    db.all(query, [postId], (err, row) => {
+      if (err) throw err;
+      res.render("pages/postCompleto", {
+        titulo: "Post Completo",
+        dados: row,
+        req: req,
+      });
+    });
+  });
+
 app.get("/nao-autorizado", (req, res) => {
-    console.log("GET /nao-autorizado")
-    res.render ("pages/nao-autorizado", {titulo: "Não Autorizado" })
-})
+  console.log("GET /nao-autorizado");
+  res.render("pages/nao-autorizado", { titulo: "Não Autorizado" });
+});
 
 app.get("/logout", (req, res) => {
   console.log("GET /logout");
@@ -155,9 +221,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.use('/{*erro}', (req, res) => {
-    // Envia uma resposta de erro 404
-    res.status(404).render('pages/fail', {titulo: "ERRO 404",req: req, msg: "404"});
+app.use("/{*erro}", (req, res) => {
+  // Envia uma resposta de erro 404
+  res
+    .status(404)
+    .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
 });
 
 app.listen(PORT, () => {

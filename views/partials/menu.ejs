@@ -3,14 +3,16 @@
         <ul>
             <li><a href="/">HOME</a></li>
             <li><a href="/sobre">SOBRE</a></li>
+            <li><a href="/posts">POSTAGENS</a></li>
             <% if(req.session.loggedin) { %>
-            <li><a href="/dashboard">DASHBOARD</a></li>
-            <% } else { %>
-                <a href="/login">LOGIN</a> 
+                <li><a href="/novo-post">NOVA POSTAGEM</a></li>
+                <li><a href="/dashboard">DASHBOARD</a></li>
             <% } %>
         </ul>
     </nav>
     <% if(req.session.loggedin) { %>
     <a href="/logout">Sair da Conta</a>
+    <% } else { %>
+        <a href="/login">LOGIN</a> 
     <% } %>
 </header>
