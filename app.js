@@ -158,8 +158,33 @@ app.get("/posts", (req, res) => {
         titulo: "Posts",
         dados: row,
         req: req,
+        contentInput: null,
       });
     });
+});
+
+app.post("/posts", (req, res) => {
+  console.log("POST /posts");
+  //req.session.username, req.session.id
+    const {title} = req.body;
+    let query = `SELECT * FROM posts Where title like '%${title}%'`;
+    console.log(query);
+  
+    if (!title){
+      // res.send ("Preencha o campo para fazer uma busca <br> <a href='/posts'>Voltar</a>")
+      query = `SELECT * FROM posts`;
+    }
+    db.all(query, [], (err, row) => {
+      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+      //1. Verificar se o usuário existe
+      console.log(JSON.stringify(row));
+      res.render("pages/posts", {
+        titulo: "Posts",
+        dados: row,
+        req: req,
+        contentInput: title,
+      });
+    });  
 });
 
 app.get("/novo-post", (req, res) => {
@@ -184,28 +209,41 @@ app.post("/novo-post", (req, res) => {
     console.log("Dados da Postagem: ", req.body);
     console.log(`UserName: ${req.session.username}, ID: ${req.session.id_username}`);
     console.log("Data: ", data_atual);
+    
+    if (!title|| !content){
+      res.send ("Preencha todos os campos para criar um novo Post")
+    }
+    else{
     db.get(query, [req.session.id_username ,title, content, data_atual], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
       //1. Verificar se o usuário existe
       console.log(JSON.stringify(row));
       res.send("Post Criado <br> <a href='/novo-post'>VOLTAR</a>")
     });
-
+  }
   } else {
     res.redirect("/nao-autorizado");
   }
 });
 
 app.get("/postCompleto/:id", (req, res) => {
+    console.log ("GET /postCompleto")
+ 
   const postId = req.params.id;
   const query = "SELECT * FROM posts Where id = ?";
     db.all(query, [postId], (err, row) => {
       if (err) throw err;
+
+      if (row == ""){
+        res.status(404);
+        res.render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
+      } else {
       res.render("pages/postCompleto", {
         titulo: "Post Completo",
         dados: row,
         req: req,
       });
+    }
     });
   });
 
@@ -224,8 +262,8 @@ app.get("/logout", (req, res) => {
 app.use("/{*erro}", (req, res) => {
   // Envia uma resposta de erro 404
   res
-    .status(404)
-    .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
+  .status(404)
+  .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
 });
 
 app.listen(PORT, () => {
