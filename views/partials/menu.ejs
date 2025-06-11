@@ -4,8 +4,8 @@
             <li><a href="/">HOME</a></li>
             <li><a href="/sobre">SOBRE</a></li>
             <% if(req.session.loggedin) { %>
-                <li><a href="/novo-post">NOVA POSTAGEM</a></li>
             <% if(req.session.adm){ %>
+                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
                 <li><a href="/dashboard">DASHBOARD</a></li>
             <% } %>
             <% } %>
