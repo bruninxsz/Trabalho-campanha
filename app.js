@@ -2,9 +2,19 @@
 const express = require("express");
 const session = require("express-session");
 const sqlite3 = require("sqlite3");
+const helmet = require("helmet");
+const cors = require("cors");
+const bodyParser = require('body-parser')
 // const bodyparser = require("body-parser") //Até a versão 4 é necessario usar esse codigo
 
 const app = express(); //Armazena as chamadas e propriedades da biblioteca EXPRESS
+
+app.use(helmet())
+app.use(cors({
+  origin: "https://google.com.br",
+  origin: "https://www.bing.com/"
+}))
+app.use(bodyParser.json({limit: "3mb"}))
 
 const PORT = 8000;
 
@@ -57,7 +67,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("POST /login");
   console.log(JSON.stringify(req.body));
-  const { username, password } = req.body;
+  const { username, password, perfil } = req.body;
 
   const query = `SELECT * FROM users WHERE username=? AND password=?`;
 
@@ -71,7 +81,9 @@ app.post("/login", (req, res) => {
       req.session.username = username;
       req.session.loggedin = true;
       req.session.id_username = row.id;
-      if(username == "admin"){
+      req.session.perfil = perfil;
+
+      if(perfil == "ADM"){
       req.session.adm = true;
       res.redirect("/dashboard");
       }
@@ -141,24 +153,21 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  console.log("GET /dashboard");
+  const query = "SELECT * FROM Turmas"
+  db.all(query, [], (err, dados) => {
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro no servidor");
+    }
 
-  if (req.session.adm) {
-    //Listar todos os Usuários
-    const query = "SELECT * FROM users";
-    db.all(query, [], (err, row) => {
-      if (err) throw err;
-      // Renderiza a Página dashboard com a lista de usuário coletada no BD
-      res.render("pages/dashboard", {
-        titulo: "Dashboard",
-        dados: row,
-        req: req,
-      });
+    console.log("Registros encontrados:", dados.length);
+    
+    res.render("pages/dashboard", {
+      titulo: "Dashboard",
+      dados: dados,
+      req: req
     });
-  } else {
-    titulo = "Não Permitido";
-    res.redirect("/nao-permitido");
-  }
+  });
 });
 
 app.get("/nao-permitido", (req, res) => {
@@ -187,14 +196,6 @@ app.post("/posts/:pag", (req, res) => {
   const pag = req.params.pag;
 
   //req.session.username, req.session.id
-    const {title} = req.body;
-    let query = `SELECT * FROM posts Where title like '%${title}%'`;
-    console.log(query);
-  
-    if (!title){
-      // res.send ("Preencha o campo para fazer uma busca <br> <a href='/posts'>Voltar</a>")
-      query = `SELECT * FROM posts`;
-    }
     db.all(query, [], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
       //1. Verificar se o usuário existe

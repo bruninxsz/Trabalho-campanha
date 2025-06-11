@@ -1,13 +1,9 @@
 <table>
   <thead>
     <tr>
-      <th>Titulo</th>
-      <th>Conteudo</th>
-      <th>Data</th>
-      <th>Link do Post</th>
-      <% if (req.session.adm) { %> 
-      <th>Exluir Post</th>
-      <% } %>
+      <th>ID_Turma</th>
+      <th>Sigla</th>
+      <th>Docente</th>
     </tr>
   </thead>
   <tbody>
@@ -17,21 +13,19 @@
     <%- console.log(JSON.stringify(dados.length)); %>
 
     <!-- SE EXISTIREM MAIS DE 5 POSTS -->
-    <% if (dados.length > 5) { %> 
-      <% let i = qtd_posts-5; for (i = qtd_posts-5 ; i< qtd_posts; i++) {%>
-        <% if (i < dados.length) {%>
-        <tr>
-          <td><%= dados[i].title %></td>
-          <td><%= dados[i].content %></td>
-          <td><%= dados[i].data_criacao %></td>
-          <td><a href=/postCompleto/<%=dados[i].id%>>Post Completo</a></td>
-          <% if (req.session.adm) { %> 
-            <td><a href="/removerpost/<%= dados[i].id%>" onclick="return confirm('Tem Certeza Que Deseja Excluir o Post?')">Remover Post</a></td>
-        <% } %>
-          <% } %>
+
+      <% for(let i = 0; i < dados.length; i++) { %>
+  <% if(dados[i].sigla === req.session.sigla) { %>
+    <tr>
+      <td><%= dados[i].id_turma %></td>
+      <td><%= dados[i].sigla %></td>
+      <td><%= dados[i].docente %></td>
+    </tr>
+  <% } %>
+<% } %>
         </tr>
         </tbody>
-        <% } %>
+
     <tfoot>
       <tr>
         <% if (req.session.adm) { %> 
@@ -40,10 +34,10 @@
           <td colspan="4">
         <% } %>
           <% if (pag > 1) {%>
-          <a href="/posts/<%= Number(pag) - 1 %>"> <-- </a>
+          <a href="/posts/<%= Number(pag) - 1 %>">  </a>
           <% } %>
           <% if (qtd_posts < dados.length) {%>
-          <a href="/posts/<%= Number(pag) + 1  %>"> --> </a>
+          <a href="/posts/<%= Number(pag) + 1  %>"> </a>
           <% } %>
         </td>
       </tr>
