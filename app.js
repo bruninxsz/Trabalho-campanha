@@ -2,9 +2,19 @@
 const express = require("express");
 const session = require("express-session");
 const sqlite3 = require("sqlite3");
+const helmet = require("helmet");
+const cors = require("cors");
+const bodyParser = require('body-parser')
 // const bodyparser = require("body-parser") //Até a versão 4 é necessario usar esse codigo
 
 const app = express(); //Armazena as chamadas e propriedades da biblioteca EXPRESS
+
+app.use(helmet())
+app.use(cors({
+  origin: "https://google.com.br",
+  origin: "https://www.bing.com/"
+}))
+app.use(bodyParser.json({limit: "3mb"}))
 
 const PORT = 8000;
 
@@ -12,10 +22,10 @@ const PORT = 8000;
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
   db.run(
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_user INTEGER, title TEXT, content TEXT, data_criacao TEXT)"
+    ""
   );
 });
 
