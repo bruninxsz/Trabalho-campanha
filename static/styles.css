@@ -4,7 +4,7 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif;
   }
-  
+
   body {
     background-color: #f9f9f9;
     color: #333;
@@ -176,3 +176,99 @@
   .LogoCamp:hover {
     transform: scale(1.1);
   }
+
+  .bloqueio{
+    width: 300px;
+    height: auto;
+    background-color: transparent;
+  }
+
+  #text {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+    text-align: justify;
+  }
+
+  /* TÍTULO DA PÁGINA DE LOGIN */
+#h1Login {
+  font-size: 2.5rem;
+  margin: 40px auto 20px;
+  text-align: center;
+  color: #2a378e; /* tom do header */
+}
+
+/* FORMULÁRIO DE LOGIN */
+.formItens {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: inline-block;
+  margin-top: 20px;
+}
+
+/* TABELA DO FORMULÁRIO */
+#tblLogin {
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 10px 15px;
+}
+
+#tblLogin td {
+  font-size: 1rem;
+  color: #333;
+}
+
+#tblLogin input {
+  width: 260px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  color: #0d0d80;
+  transition: border-color 0.3s;
+}
+
+#tblLogin input:focus {
+  border-color: #2a378e;
+  outline: none;
+}
+
+#btnEntrar {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background-color: #2a378e;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+#btnEntrar:hover {
+  background-color: #1e2a70;
+
+}
+
+#cadastrar {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+#cadastrar:hover {
+  color: #004b99;
+  text-decoration: underline;
+}
+
