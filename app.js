@@ -11,12 +11,16 @@ const PORT = 8000;
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
+   db.run(
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
+  )
   db.run(
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
+    "CREATE TABLE IF NOT EXISTS Pontuacao_Roupas (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTGER)"
+  )
+   db.run(
+    "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
-  db.run(
-    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_user INTEGER, title TEXT, content TEXT, data_criacao TEXT)"
-  );
+
 });
 
 app.use(
@@ -100,8 +104,9 @@ app.post("/cadastro", (req, res) => {
   const { username, password } = req.body;
 
   const query1 = `SELECT * FROM users WHERE username=?`;
-  const query2 = `INSERT INTO users (username, password) VALUES (? , ?)`;
-
+  const query2 = `INSERT INTO users (username, password, ativo, perfil) VALUES (? , ?, ?, ?)`;
+  const ativo = 1;
+  const perfil = "USR";
   db.get(query1, [username], (err, row) => {
     if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
 
@@ -113,7 +118,7 @@ app.post("/cadastro", (req, res) => {
       res.redirect("/usuario-ja-cadastrado");
     } else {
       //3. Se não, fazer o insert
-      db.get(query2, [username, password], (err, row) => {
+      db.get(query2, [username, password, ativo, perfil], (err, row) => {
         if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
 
         //1. Verificar se o usuário existe
