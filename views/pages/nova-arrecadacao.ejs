@@ -17,7 +17,25 @@
       <option value="<%= turmas[i].id_turma %>"><%= turmas[i].sigla %> - [<%= turmas[i].docente %>]</option>
       <% } %>
     </select>
-
+    <br>&nbsp;
+    <label for="roupas">Selecione a Roupa:</label>
+    <select name="id_pontuacao" id="id_pontuacao" style="width: 200px;">
+      <option value="">[Escolha]</option>
+      <% for (let i = 0; i < pontuacoes.length; i++) { %>
+      <option value="<%= pontuacoes[i].id %>">
+        <%= pontuacoes[i].Descricao %> - <%= pontuacoes[i].pontos %> pontos
+      </option>
+      <% } %>
+    </select>
+    <br>&nbsp;
+    <label for="roupas">Selecione a quantidade:</label>
+    <select name="qtd" id="qtd" style="width: 200px;">
+      <option value="">[Escolha]</option>
+      <% for (let i = 1; i <= 15; i++) { %>
+      <option value="<%= i %>"><%= i %></option>
+      <% } %>
+    </select>
+    </select>
     <button type="submit">Enviar</button>
   </form>
 </body>
