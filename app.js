@@ -57,7 +57,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("POST /login");
   console.log(JSON.stringify(req.body));
-  const { username, password } = req.body;
+  const { username, password, perfil} = req.body;
 
   const query = `SELECT * FROM users WHERE username=? AND password=?`;
 
@@ -69,9 +69,10 @@ app.post("/login", (req, res) => {
     if (row) {
       //2. Se o usuário existir e a senha é válida no BD, executar o processo de login
       req.session.username = username;
+      req.session.perfil = perfil;
       req.session.loggedin = true;
       req.session.id_username = row.id;
-      if(username == "admin"){
+      if(perfil == "ADM"){
       req.session.adm = true;
       res.redirect("/dashboard");
       }
