@@ -152,6 +152,31 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
   });
 });
 
+app.get("/salasolo", (req, res) => {
+  const query = "SELECT * FROM Turmas"
+  const query2 = "SELECT * FROM Pontuacao_Roupas"
+  db.all(query, [], (err, turmas) => {
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+
+    db.all(query2,[],(err,pountuacoes) =>{
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+    console.log("Registros encontrados:", dados.length);
+    
+    res.render("pages/salasolo", {
+      titulo: "sala-sozinha",
+      turmas: turmas,
+      pountuacoes: pountuacoes,
+      req: req
+    })});
+  });
+});
+
 app.get("/dashboard", (req, res) => {
   const query = "SELECT * FROM Turmas"
   db.all(query, [], (err, dados) => {
@@ -175,40 +200,7 @@ app.get("/nao-permitido", (req, res) => {
   res.render("pages/nao-permitido", { titulo: "Não Permitido" });
 });
 
-app.get("/posts/:pag", (req, res) => {
-  console.log("GET /posts");
-  const pag = req.params.pag;
-  const query = "SELECT * FROM posts";
-    db.all(query, [], (err, row) => {
-      if (err) throw err;
-      res.render("pages/posts", {
-        titulo: "Posts",
-        dados: row,
-        req: req,
-        pag: pag,
-        contentInput: null,
-      });
-    });
-});
 
-app.post("/posts/:pag", (req, res) => {
-  console.log("POST /posts");
-  const pag = req.params.pag;
-
-  //req.session.username, req.session.id
-    db.all(query, [], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-      //1. Verificar se o usuário existe
-      console.log(JSON.stringify(row));
-      res.render("pages/posts", {
-        titulo: "Posts",
-        dados: row,
-        req: req,
-        pag: pag,
-        contentInput: title,
-      });
-    });  
-});
 
 app.get("/removerpost/:id", (req, res) => {  
   if (req.session.adm){
