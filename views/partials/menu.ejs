@@ -5,6 +5,7 @@
             <li><a href="/sobre">SOBRE</a></li>
             <% if(req.session.loggedin) { %>
             <% if(req.session.adm){ %>
+                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
                 <li><a href="/dashboard">DASHBOARD</a></li>
             <% } %>
             <% } %>

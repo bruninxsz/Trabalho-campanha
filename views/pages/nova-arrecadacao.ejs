@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Arrecadação</title>
+</head>
+
+<body>
+  <h1>Nova Arrecadação</h1>
+
+  <form action="/selecao" method="GET">
+    <label for="turma">Selecione uma turma:</label>
+    <select name="id_turma" id="id_turma" style="width: 200px;">
+      <option value="">[Escolha]</option>
+      <% let i = 0; for (i = 0 ; i< turmas.length; i++) {%>
+      <option value="<%= turmas[i].id_turma %>"><%= turmas[i].sigla %> - [<%= turmas[i].docente %>]</option>
+      <% } %>
+    </select>
+
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+
+</html>

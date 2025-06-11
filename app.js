@@ -20,7 +20,9 @@ db.serialize(() => {
    db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
-
+  db.run(
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
+  );
 });
 
 app.use(
@@ -48,6 +50,63 @@ app.get("/sobre", (req, res) => {
   res.render("pages/sobre", { titulo: "Sobre", req: req });
 });
 
+app.get("/nova-arrecadacao", (req, res) => {
+ if (req.session.adm) {
+    console.log("GET /nova-arrecadacao");
+const query = "SELECT * FROM Turmas";
+const query2 = "SELECT * FROM Pontuacao_Roupas";
+
+// Primeiro obtemos os dados de ambas as tabelas
+db.all(query, [], (err, turmas) => {
+  if (err) throw err;
+  
+  db.all(query2, [], (err, pontuacoes) => {
+    if (err) throw err;
+    
+    // Só renderizamos a página quando temos todos os dados
+    res.render("pages/nova-arrecadacao", { 
+      titulo: "Nova Doação", 
+      req: req, 
+      turmas: turmas, 
+      pontuacoes: pontuacoes 
+    });
+  });
+});
+  } else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }
+});
+
+app.post("/nova-arrecadacao", (req, res) => {
+  console.log("POST /nova-arrecadacao");
+  // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
+  //req.session.username, req.session.id
+  if (req.session.adm) {
+    const {id_turma, id_roupa, qtd } = req.body;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
+    const data = new Date();
+    const data_atual = data.toLocaleDateString();
+    console.log(JSON.stringify(req.body));
+    console.log(JSON.stringify(data_atual));
+    
+    db.get(query, [id_turma ,id_roupa, qtd, data_atual], (err, row) => {
+      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+      //1. Verificar se o usuário existe
+      console.log(JSON.stringify(row));
+      res.redirect("/nova-arrecadacao")
+    });
+  
+  } else {
+    res.redirect("/nao-autorizado");
+  }
+});
+
+// Inicia o servidor
+app.listen(3000, () => {
+  console.log('Servidor rodando em http://localhost:3000');
+});
+
 app.get("/login", (req, res) => {
   console.log("GET /login");
   res.render("pages/login", { titulo: "Login" });
@@ -72,7 +131,7 @@ app.post("/login", (req, res) => {
       req.session.perfil = perfil;
       req.session.loggedin = true;
       req.session.id_username = row.id;
-      if(perfil == "ADM"){
+      if(row.perfil == "ADM"){
       req.session.adm = true;
       res.redirect("/dashboard");
       }
