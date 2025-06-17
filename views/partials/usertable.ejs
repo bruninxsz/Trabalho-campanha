@@ -1,32 +1,24 @@
-<%- console.log(JSON.stringify(dados)); %>
-<%- console.log(JSON.stringify(req.session.username)); %>
+<%- console.log("Dados recebidos:", JSON.stringify(dados)) %>
+<%- console.log("Sigla na sessão:", req.session.sigla) %>
 
 <table>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Username</th>
-      <th>Senha</th>
+      <th>ID_Turma</th>
+      <th>Sigla</th>
+      <th>Docente</th>
     </tr>
   </thead>
+  
   <tbody>
-    <% let i = 0; for (i = 0; i< dados.length; i++) {%>
-    <% if (dados[i].username == req.session.username) {%>
-      <tr style="background-color: red; color: white;">
-    <%} else {%>
-    <tr>
-    <% }%>
-      <td><%= dados[i].id %></td>
-      <td><%= dados[i].username %></td>
-      <td><%= dados[i].password %></td>
-    </tr>
-    <% } %>
+      <% let i= 0; for(i = 0 ; i<dados.length; i++) { %>
+        <!-- Removi o filtro para testar -->
+        <tr>
+          <td><%= dados[i].id_turma %></td>
+          <td><%= dados[i].sigla %></td>
+          <td><%= dados[i].docente %></td>
+          <td><%= dados[]i.pontos %></td>
+        </tr>
+      <% } %>
   </tbody>
-  <tfoot>
-    <tr>
-        <td colspan="3">
-            <%- `Qtd de Registros: ${i}`%>
-        </td>
-    </tr>
-  </tfoot>
 </table>
