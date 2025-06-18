@@ -6,7 +6,7 @@
   }
 
   body {
-    background: linear-gradient(to right, #0d47a1, #1976d2, #42a5f5);
+    background: linear-gradient(to right, #999999, #b3b3b3, #cccccc, #ffffff);
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
@@ -211,7 +211,7 @@
 }
 
 .h1arrec{
-    color:aliceblue;
+    color:rgb(0, 0, 0);
 }
 
 .formItens {
