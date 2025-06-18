@@ -9,7 +9,8 @@
 <body>
   <h1>Nova Arrecadação</h1>
 
-  <form action="/selecao" method="GET">
+  <form action="/nova-arrecadacao" method="post">
+
     <label for="turma">Selecione uma turma:</label>
     <select name="id_turma" id="id_turma" style="width: 200px;">
       <option value="">[Escolha]</option>
@@ -17,9 +18,11 @@
       <option value="<%= turmas[i].id_turma %>"><%= turmas[i].sigla %> - [<%= turmas[i].docente %>]</option>
       <% } %>
     </select>
+
     <br>&nbsp;
+
     <label for="roupas">Selecione a Roupa:</label>
-    <select name="id_pontuacao" id="id_pontuacao" style="width: 200px;">
+    <select name="id_roupa" id="id_roupa" style="width: 200px;">
       <option value="">[Escolha]</option>
       <% for (let i = 0; i < pontuacoes.length; i++) { %>
       <option value="<%= pontuacoes[i].id %>">
@@ -27,7 +30,9 @@
       </option>
       <% } %>
     </select>
+
     <br>&nbsp;
+
     <label for="roupas">Selecione a quantidade:</label>
     <select name="qtd" id="qtd" style="width: 200px;">
       <option value="">[Escolha]</option>
@@ -35,7 +40,7 @@
       <option value="<%= i %>"><%= i %></option>
       <% } %>
     </select>
-    </select>
+
     <button type="submit">Enviar</button>
   </form>
 </body>
