@@ -33,6 +33,7 @@ db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
   );
+  
 });
 
 app.use(
