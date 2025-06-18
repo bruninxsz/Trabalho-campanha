@@ -1,6 +1,7 @@
 <table>
   <thead>
     <tr>
+      <th>Posição</th>
       <th>Sigla</th>
       <th>Docente</th>
       <th>Pontos</th>
@@ -9,6 +10,7 @@
   <tbody>
     <% for(let i = 0; i < selectTurmas.length; i++) { %>
       <tr>
+        <td><%= i + 1 %>°</td>
         <td><%= selectTurmas[i].sigla %></td>
         <td><%= selectTurmas[i].docente %></td>
         <td><%= selectTurmas[i].pontos %></td>

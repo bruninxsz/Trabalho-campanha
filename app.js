@@ -222,7 +222,7 @@ app.get("/dashboard", (req, res) => {
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
     LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
     GROUP BY Turmas.id_turma
-    ORDER BY Turmas.id_turma;
+    ORDER BY pontos DESC;
   `;
 
   db.all(query, [], (err, resultado) => {
