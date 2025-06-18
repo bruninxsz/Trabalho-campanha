@@ -268,6 +268,34 @@ app.get("/dashboard", (req, res) => {
   res.redirect("/nao-autorizado");
 }});
 
+app.get("/dashboard/turma/:id", (req, res) => {
+  const turmaId = req.params.id;
+  
+  const query = `
+    SELECT 
+      Roupas.nome AS roupa,
+      Arrecadacoes.qtd AS quantidade,
+      Pontuacao_Roupas.pontos AS pontos_unidade
+    FROM Pontuacao_Roupas
+    INNER JOIN Arrecadacoes ON Pontuacao_Roupas.id = Arrecadacoes.id_arrecadacao
+    INNER JOIN Roupas ON Pontuacao_Roupas.id_roupa = Roupas.id_roupa
+    WHERE Pontuacao_Roupas.id_turma = ?
+  `;
+
+  db.all(query, [turmaId], (err, itensDoados) => {
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+    
+    res.render("pages/detalhesTurma", {
+      titulo: "Detalhes da Turma",
+      itensDoados: itensDoados,
+      turmaId: turmaId
+    });
+  });
+});
+
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
   res.render("pages/nao-permitido", { titulo: "Não Permitido" });

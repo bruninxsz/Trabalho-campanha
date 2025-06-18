@@ -8,8 +8,8 @@
   </thead>
   <tbody>
     <% turmasComPontos.forEach(turma => { %>
-      <tr>
-        <td><a href="/salasolo"><%= turma.sigla %></a></td>
+      <tr onclick="window.location='/dashboard/turma/<%= turma.id_turma %>';" style="cursor: pointer;">
+        <td><%= turma.sigla %></td>
         <td><%= turma.docente %></td>
         <td><%= turma.total_pontos %></td>
       </tr>

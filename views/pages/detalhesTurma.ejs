@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= titulo %></title>
+</head>
+<body>
+    <a href="/dashboard" class="back-button">Voltar ao Dashboard</a>
+    
+    <h1>Itens doados pela Turma <%= turmaId %></h1>
+    
+    <% if (itensDoados.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Roupa</th>
+                    <th>Quantidade</th>
+                    <th>Pontos por Unidade</th>
+                    <th>Total de Pontos</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% itensDoados.forEach(item => { %>
+                    <tr>
+                        <td><%= item.roupa %></td>
+                        <td><%= item.quantidade %></td>
+                        <td><%= item.pontos_unidade %></td>
+                        <td><%= item.quantidade * item.pontos_unidade %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>Esta turma ainda não realizou doações.</p>
+    <% } %>
+</body>
+</html>
