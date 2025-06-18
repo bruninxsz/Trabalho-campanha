@@ -1,24 +1,18 @@
-<%- console.log("Dados recebidos:", JSON.stringify(dados)) %>
-<%- console.log("Sigla na sessão:", req.session.sigla) %>
-
 <table>
   <thead>
     <tr>
-      <th>ID_Turma</th>
       <th>Sigla</th>
       <th>Docente</th>
+      <th>Pontos</th>
     </tr>
   </thead>
-  
   <tbody>
-      <% let i= 0; for(i = 0 ; i<dados.length; i++) { %>
-        <!-- Removi o filtro para testar -->
-        <tr>
-          <td><%= dados[i].id_turma %></td>
-          <td><%= dados[i].sigla %></td>
-          <td><%= dados[i].docente %></td>
-          <td><%= dados[i].pontos %></td>
-        </tr>
-      <% } %>
+    <% turmasComPontos.forEach(turma => { %>
+      <tr>
+        <td><a href="/salasolo"><%= turma.sigla %></a></td>
+        <td><%= turma.docente %></td>
+        <td><%= turma.total_pontos %></td>
+      </tr>
+    <% }); %>
   </tbody>
 </table>

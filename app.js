@@ -237,89 +237,40 @@ app.get("/salasolo", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  const query = "SELECT * FROM Turmas"
-  db.all(query, [], (err, dados) => {
+  if(req.session.loggedin){
+  const query = `
+    SELECT 
+      Turmas.id_turma,
+      Turmas.sigla,
+      Turmas.docente,
+      COALESCE(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS total_pontos
+    FROM Turmas
+    LEFT JOIN Pontuacao_Roupas ON Turmas.id_turma = Pontuacao_Roupas.id
+    LEFT JOIN Arrecadacoes ON Pontuacao_Roupas.id = Arrecadacoes.id_arrecadacao
+    GROUP BY Turmas.id_turma
+    ORDER BY total_pontos DESC;
+  `;
+
+  db.all(query, [], (err, turmasComPontos) => {
     if (err) {
       console.error("Erro no banco:", err);
       return res.status(500).send("Erro no servidor");
     }
-
-    console.log("Registros encontrados:", dados.length);
     
     res.render("pages/dashboard", {
-      titulo: "Dashboard",
-      dados: dados,
+      titulo: "Tabela Geral",
+      turmasComPontos: turmasComPontos,
       req: req
     });
   });
-});
+}else{
+  tituloError = "Não Autorizado";
+  res.redirect("/nao-autorizado");
+}});
 
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
   res.render("pages/nao-permitido", { titulo: "Não Permitido" });
-});
-
-
-
-app.get("/removerpost/:id", (req, res) => {  
-  if (req.session.adm){
-    const id = req.params.id;
-    let query = "DELETE from posts Where id = ?";
-    db.get(query, [id], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-
-      //1. Verificar se o usuário existe
-      console.log(`Post ${id} excluido com sucesso`);
-      res.redirect("/posts/1");
-    });
-  }
-  else{
-    titulo = "Não Permitido";
-    res.redirect("/nao-permitido");
-  }
-})
-
-app.get("/editarPost/:id", (req, res) => {  
-  if (req.session.adm){
-    const id = req.params.id;
-    let query = "Select * from posts Where id = ?";
-    db.get(query, [id], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-
-      //1. Verificar se o usuário existe
-      res.render("pages/editarPost", {dados: row, req:req, titulo: "Editar Post"});
-    });
-  }
-  else{
-    titulo = "Não Permitido";
-    res.redirect("/nao-permitido");
-  }
-})
-
-app.post("/editarPost/:id", (req, res) => {
-  console.log("POST /editarPost");
-  // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
-  //req.session.username, req.session.id
-  if (req.session.adm) {
-    const id = req.params.id;
-    const { title, content} = req.body;
-    const query = `UPDATE posts SET title= ?, content= ? WHERE id= ?`;
-    console.log("Dados da Postagem: ", req.body);
-    
-    if (!title|| !content){
-      res.send ("Preencha todos os campos para editar o Post")
-    }
-    else{
-    db.all(query, [title, content, id], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-      //1. Verificar se o usuário existe
-      console.log(JSON.stringify(row));
-      res.redirect("/postCompleto/" + id)
-    });
-  }
-  } else {
-    res.redirect("/nao-autorizado");
-  }
 });
 
 app.get("/novo-post", (req, res) => {
