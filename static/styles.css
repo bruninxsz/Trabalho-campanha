@@ -3,92 +3,92 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif;
-}
+  }
 
-body {
+  body {
     background-color: #f9f9f9;
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
-}
-
-/* HEADER (TOPO) */
-header {
-    background-color: red;
+  }
+  
+  /* HEADER (TOPO) */
+  header {
+    background-color: rgb(42, 55, 142);
     padding: 16px 32px;
     color: white;
     text-align: right;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-header a {
+  }
+  
+  header a {
     color: white;
     text-decoration: none;
     font-weight: bold;
     margin-left: 15px;
     transition: color 0.3s ease;
-}
-
-header a:hover {
+  }
+  
+  header a:hover {
     color: white;
-}
-
-/* MENU DE NAVEGAÇÃO */
-nav {
-    background: transparent; /* sem cor de fundo */
+  }
+  
+  /* MENU DE NAVEGAÇÃO */
+  nav {
+    background: transparent;
     padding: 15px 0;
     text-align: center;
-}
-
-nav ul {
+  }
+  
+  nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-nav ul li {
+  }
+  
+  nav ul li {
     display: inline-block;
     margin: 0 25px;
     position: relative;
-}
-
-nav ul li::after {
+  }
+  
+  nav ul li::after {
     content: '';
     display: block;
     height: 2px;
     width: 0%;
-    background: white; /* linha de destaque branca */
+    background: white;
     transition: width 0.3s;
     margin: 5px auto 0 auto;
-}
-
-nav ul li:hover::after {
+  }
+  
+  nav ul li:hover::after {
     width: 100%;
-}
-
-nav ul li a {
+  }
+  
+  nav ul li a {
     text-decoration: none;
-    color: white; /* cor do menu branca */
+    color: white;
     font-weight: bold;
     font-size: 1.1rem;
     transition: transform 0.2s, color 0.2s;
-}
-
-nav ul li a:hover {
+  }
+  
+  nav ul li a:hover {
     transform: scale(1.1);
-    color: white; /* permanece branca no hover */
-}
-
-/* TÍTULO DA PÁGINA DE LOGIN */
-#h1Login {
+    color: white;
+  }
+  
+  /* TÍTULO DA PÁGINA DE LOGIN */
+  #h1Login {
     font-size: 2.5rem;
     margin: 30px auto;
     text-align: center;
     color: red;
-}
-
-/* CAMPOS DE FORMULÁRIO */
-input, textarea {
+  }
+  
+  /* CAMPOS DE FORMULÁRIO */
+  input, textarea {
     font-size: 16px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -99,51 +99,27 @@ input, textarea {
     outline: none;
     transition: border 0.3s ease;
     display: inline-block;
-}
-
-/* TABELAS DE FORMULÁRIOS */
-table {
+  }
+  
+  /* TABELAS DE FORMULÁRIOS */
+  table {
     width: auto;
     margin: 20px auto;
-}
-
-#tblLogin tr td:first-child {
+  }
+  
+  #tblLogin tr td:first-child {
     text-align: right;
     padding-right: 10px;
     white-space: nowrap;
-}
-
-#tblLogin tr td:last-child {
+  }
+  
+  #tblLogin tr td:last-child {
     text-align: left;
-}
-
-#tblPost tr td {
+  }
+  
+  #tblPost tr td {
     text-align: left;
     padding-left: 10px;
-}
-
-/* TABELA DOAÇÃO DA SALA SELECIONADA */
-
-.tabela-doacao-sala {
-  width: 25%;
-  font-weight: bold;
-  border-spacing: 0;
-  border: 3px solid #003366; 
-  border-radius: 10px;
-  background-color: #6699CC; 
-  color: white;
-}
-
-.tabela-doacao-sala th, .tabela-doacao-sala td {
-  border: 2px solid #003366; /* Borda interna azul escuro */
-  padding: 10px;
-  text-align: center;
-}
-
-.tabela-doacao-sala th {
-  text-align: center;
-  background-color: #336699; /*azul intermediário para o cabeçalho */
-  font-weight: bold;
 }
 
 /* BOTÕES */
@@ -157,36 +133,142 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s;
-}
-
-button:hover {
+  }
+  
+  button:hover {
     background-color: #cc0000;
     transform: scale(1.05);
-}
-
-/* RODAPÉ FIXO */
-footer {
+  }
+  
+  /* RODAPÉ FIXO */
+  footer {
     position: sticky;
     top: 100vh;
     width: 100%;
-    background-color: red;
+    background-color: rgb(42, 55, 142);
     color: white;
     text-align: center;
     padding: 12px 0;
     font-size: 0.9rem;
-}
-
-#MainDash *{
+  }
+  
+  #MainDash * {
     border: 1px solid;
     width: 900px;
-}
-
-#MainDash table{
+  }
+  
+  #MainDash table {
     text-align: center;
     border: 3px solid;
+  }
+  
+  /* LINKS GERAIS */
+  a {
+    font-size: large;
+  }
+  
+  .LogoCamp {
+    border-radius: 15%;
+    transition: transform 0.3s ease;
+    margin-left: 480px;
+  }
+  
+  .LogoCamp:hover {
+    transform: scale(1.1);
+  }
+
+  .bloqueio{
+    width: 300px;
+    height: auto;
+    background-color: transparent;
+  }
+
+  #text {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+    text-align: justify;
+  }
+
+  /* TÍTULO DA PÁGINA DE LOGIN */
+#h1Login {
+  font-size: 2.5rem;
+  margin: 40px auto 20px;
+  text-align: center;
+  color: #2a378e; /* tom do header */
 }
 
-/* LINKS GERAIS */
-a {
-    font-size: large;
+/* FORMULÁRIO DE LOGIN */
+.formItens {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: inline-block;
+  margin-top: 20px;
 }
+
+/* TABELA DO FORMULÁRIO */
+#tblLogin {
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 10px 15px;
+}
+
+#tblLogin td {
+  font-size: 1rem;
+  color: #333;
+}
+
+#tblLogin input {
+  width: 260px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  color: #0d0d80;
+  transition: border-color 0.3s;
+}
+
+#tblLogin input:focus {
+  border-color: #2a378e;
+  outline: none;
+}
+
+#btnEntrar {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background-color: #2a378e;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+#btnEntrar:hover {
+  background-color: #1e2a70;
+
+}
+
+#cadastrar {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+#cadastrar:hover {
+  color: #004b99;
+  text-decoration: underline;
+}
+
