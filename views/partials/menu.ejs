@@ -3,12 +3,12 @@
         <ul>
             <li><a href="/">HOME</a></li>
             <li><a href="/sobre">SOBRE</a></li>
-            <li><a href="/posts/1">POSTAGENS</a></li>
             <% if(req.session.loggedin) { %>
-                <li><a href="/novo-post">NOVA POSTAGEM</a></li>
             <% if(req.session.adm){ %>
-                <li><a href="/dashboard">DASHBOARD</a></li>
+                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
+                
             <% } %>
+            <li><a href="/dashboard">TABELA DE ARRECADAÇÕES</a></li>
             <% } %>
         </ul>
     </nav>
