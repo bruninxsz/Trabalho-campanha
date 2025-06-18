@@ -9,9 +9,12 @@
 </head>
 
 <body>
+  <center>
+    <br><br>
   <h1>Nova Arrecadação</h1>
+  <br>
 
-  <form action="/nova-arrecadacao" method="post">
+    <form action="/nova-arrecadacao" method="post" class="envio">
 
     <label for="turma">Selecione uma turma:</label>
     <select name="id_turma" id="id_turma" style="width: 200px;">
@@ -20,6 +23,7 @@
       <option value="<%= turmas[i].id_turma %>"><%= turmas[i].sigla %> - [<%= turmas[i].docente %>]</option>
       <% } %>
     </select>
+    <br>
 
     <br>&nbsp;
 
@@ -32,7 +36,7 @@
       </option>
       <% } %>
     </select>
-
+<br>
     <br>&nbsp;
 
     <label for="roupas">Selecione a quantidade:</label>
@@ -42,9 +46,14 @@
       <option value="<%= i %>"><%= i %></option>
       <% } %>
     </select>
+    <br><br>
 
     <button type="submit" class="novarrec">Enviar</button>
+
   </form>
+</center>
+<br><br>
+<%- include("../partials/footer") %>
 </body>
-<%- include("../partials/footer ") %>
+
 </html>
