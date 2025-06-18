@@ -55,10 +55,6 @@ app.get("/", (req, res) => {
   res.render("pages/index", { titulo: "Index", req: req });
 });
 
-app.get("/doacao-sala", (req, res) => {
-  console.log("GET /doacao-sala");
-  res.render("pages/doacao-sala", { titulo: "Doação da sala selecionada", req: req });
-});
 
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");

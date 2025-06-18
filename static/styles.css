@@ -6,7 +6,7 @@
   }
 
   body {
-    background-color: #f9f9f9;
+    background: linear-gradient(to right, #0d47a1, #1976d2, #42a5f5);
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
@@ -101,16 +101,35 @@
   }
   
 
-  table {
-    width: auto;
-    margin: 20px auto;
+  .tabela-doacao {
+    width: 25%;
+    font-weight: bold;
+    border-spacing: 0;
+    border: 3px solid #003366; 
+    border-radius: 10px;
+    background-color: #6699CC; 
+    color: white;
+
   }
+
+  .tabela-doacao th, .tabela-doacao td {
+  border: 2px solid #003366;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabela-doacao th {
+  text-align: center;
+  background-color: #336699;
+  font-weight: bold;
+}
+
   
   
   button {
     padding: 10px 20px;
     border: none;
-    background-color: red;
+    background-color:rgb(42, 55, 142);
     color: white;
     border-radius: 8px;
     font-size: 1rem;
@@ -120,7 +139,7 @@
   }
   
   button:hover {
-    background-color: #cc0000;
+    background-color:rgb(33, 44, 115);
     transform: scale(1.05);
   }
   
@@ -154,7 +173,10 @@
   .LogoCamp {
     border-radius: 15%;
     transition: transform 0.3s ease;
-    margin-left: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    
   }
   
   .LogoCamp:hover {
@@ -188,6 +210,9 @@
   color: #2a378e;
 }
 
+.h1arrec{
+    color:aliceblue;
+}
 
 .formItens {
   background-color: white;
@@ -258,10 +283,33 @@
 
 .envio{
   background-color: white;
-  padding: 30px 40px;
+  padding: 60px 60px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   display: inline-block;
+  margin-top: 50px;
+  font-size: 1.3rem;
+  text-align:justify;
+
+}
+
+.novarrec {
   margin-top: 20px;
-  
+  margin-left:170px;
+  display: block;
+  padding: 10px 20px;
+  background-color: rgb(42, 55, 142);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: justify;
+
+}
+
+.novarrec:hover {
+  background-color: rgb(33, 44, 115);
 }
