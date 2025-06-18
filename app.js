@@ -212,6 +212,7 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
+  if(req.session.loggedin){
   const query = `
     SELECT 
       Turmas.id_turma,
@@ -237,7 +238,9 @@ app.get("/dashboard", (req, res) => {
       req: req
     });
   });
-});
+}else {
+  res.redirect("/nao-permitido")
+}});
 
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
