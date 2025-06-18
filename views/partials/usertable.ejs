@@ -7,12 +7,12 @@
     </tr>
   </thead>
   <tbody>
-    <% turmasComPontos.forEach(turma => { %>
-      <tr onclick="window.location='/dashboard/turma/<%= turma.id_turma %>';" style="cursor: pointer;">
-        <td><%= turma.sigla %></td>
-        <td><%= turma.docente %></td>
-        <td><%= turma.total_pontos %></td>
+    <% for(let i = 0; i < selectTurmas.length; i++) { %>
+      <tr>
+        <td><%= selectTurmas[i].sigla %></td>
+        <td><%= selectTurmas[i].docente %></td>
+        <td><%= selectTurmas[i].pontos %></td>
       </tr>
-    <% }); %>
+    <% } %>
   </tbody>
 </table>

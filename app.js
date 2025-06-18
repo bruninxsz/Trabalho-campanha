@@ -211,87 +211,30 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
   });
 });
 
-app.get("/salasolo", (req, res) => {
-  const query = "SELECT * FROM Turmas"
-  const query2 = "SELECT * FROM Pontuacao_Roupas"
-  db.all(query, [], (err, turmas) => {
-    if (err) {
-      console.error("Erro no banco:", err);
-      return res.status(500).send("Erro no servidor");
-    }
-
-    db.all(query2,[],(err,pountuacoes) =>{
-    if (err) {
-      console.error("Erro no banco:", err);
-      return res.status(500).send("Erro no servidor");
-    }
-    console.log("Registros encontrados:", dados.length);
-    
-    res.render("pages/salasolo", {
-      titulo: "sala-sozinha",
-      turmas: turmas,
-      pountuacoes: pountuacoes,
-      req: req
-    })});
-  });
-});
-
 app.get("/dashboard", (req, res) => {
-  if(req.session.loggedin){
   const query = `
     SELECT 
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      COALESCE(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS total_pontos
+      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
-    LEFT JOIN Pontuacao_Roupas ON Turmas.id_turma = Pontuacao_Roupas.id
-    LEFT JOIN Arrecadacoes ON Pontuacao_Roupas.id = Arrecadacoes.id_arrecadacao
+    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
+    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
     GROUP BY Turmas.id_turma
-    ORDER BY total_pontos DESC;
+    ORDER BY Turmas.id_turma;
   `;
 
-  db.all(query, [], (err, turmasComPontos) => {
+  db.all(query, [], (err, resultado) => {
     if (err) {
       console.error("Erro no banco:", err);
       return res.status(500).send("Erro no servidor");
     }
-    
+
     res.render("pages/dashboard", {
-      titulo: "Tabela Geral",
-      turmasComPontos: turmasComPontos,
+      titulo: "Dashboard",
+      selectTurmas: resultado,
       req: req
-    });
-  });
-}else{
-  tituloError = "Não Autorizado";
-  res.redirect("/nao-autorizado");
-}});
-
-app.get("/dashboard/turma/:id", (req, res) => {
-  const turmaId = req.params.id;
-  
-  const query = `
-    SELECT 
-      Roupas.nome AS roupa,
-      Arrecadacoes.qtd AS quantidade,
-      Pontuacao_Roupas.pontos AS pontos_unidade
-    FROM Pontuacao_Roupas
-    INNER JOIN Arrecadacoes ON Pontuacao_Roupas.id = Arrecadacoes.id_arrecadacao
-    INNER JOIN Roupas ON Pontuacao_Roupas.id_roupa = Roupas.id_roupa
-    WHERE Pontuacao_Roupas.id_turma = ?
-  `;
-
-  db.all(query, [turmaId], (err, itensDoados) => {
-    if (err) {
-      console.error("Erro no banco:", err);
-      return res.status(500).send("Erro no servidor");
-    }
-    
-    res.render("pages/detalhesTurma", {
-      titulo: "Detalhes da Turma",
-      itensDoados: itensDoados,
-      turmaId: turmaId
     });
   });
 });
@@ -300,67 +243,6 @@ app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
   res.render("pages/nao-permitido", { titulo: "Não Permitido" });
 });
-
-app.get("/novo-post", (req, res) => {
-  if (req.session.loggedin) {
-    console.log("GET /novo-post");
-    res.render("pages/novo-post", { titulo: "Nova Postagem", req: req });
-  } else {
-    tituloError = "Não Autorizado";
-    res.redirect("/nao-autorizado");
-  }
-});
-
-app.post("/novo-post", (req, res) => {
-  console.log("POST /novo-post");
-  // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
-  //req.session.username, req.session.id
-  if (req.session.loggedin) {
-    const { title, content } = req.body;
-    const query = `INSERT INTO posts (id_user, title, content, data_criacao) VALUES (?, ? , ?, ?)`;
-    const data = new Date();
-    const data_atual = data.toLocaleDateString();
-    console.log("Dados da Postagem: ", req.body);
-    console.log(`UserName: ${req.session.username}, ID: ${req.session.id_username}`);
-    console.log("Data: ", data_atual);
-    
-    if (!title|| !content){
-      res.send ("Preencha todos os campos para criar um novo Post")
-    }
-    else{
-    db.get(query, [req.session.id_username ,title, content, data_atual], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-      //1. Verificar se o usuário existe
-      console.log(JSON.stringify(row));
-      res.redirect("/posts/1")
-    });
-  }
-  } else {
-    res.redirect("/nao-autorizado");
-  }
-});
-
-app.get("/postCompleto/:id", (req, res) => {
-    console.log ("GET /postCompleto")
- 
-  const postId = req.params.id;
-  const query = "SELECT users.username, posts.id, title, content, data_criacao FROM posts INNER JOIN users ON posts.id_user = users.id Where posts.id = ?";
-    db.all(query, [postId], (err, row) => {
-      if (err) throw err;
-
-      if (row == ""){
-        res.status(404);
-        res.render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
-      } else {
-      console.log(row)
-      res.render("pages/postCompleto", {
-        titulo: "Post Completo",
-        dados: row,
-        req: req,
-      });
-    }
-    });
-  });
 
 app.get("/nao-autorizado", (req, res) => {
   console.log("GET /nao-autorizado");
