@@ -55,6 +55,7 @@ app.get("/", (req, res) => {
   res.render("pages/index", { titulo: "Index", req: req });
 });
 
+
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
   res.render("pages/sobre", { titulo: "Sobre", req: req });
