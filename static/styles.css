@@ -12,6 +12,9 @@
     min-height: 100vh;
   }
   
+  h1{
+    color: #8458B3;
+  }
 
   header {
     background-color: #d0bdf4;
