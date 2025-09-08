@@ -22,18 +22,22 @@ const PORT = 8000;
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
    db.run(
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
-  )
+    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTEGER, perfil TEXT(3))"
+  );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Pontuacao_Roupas (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTGER)"
-  )
+    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTEGER)"
+  );
    db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data TEXT)"
   );
   
+  db.run(
+    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
+  );
+
 });
 
 app.use(
