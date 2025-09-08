@@ -254,6 +254,17 @@ app.get("/nao-autorizado", (req, res) => {
   res.render("pages/nao-autorizado", { titulo: "Não Autorizado" });
 });
 
+app.get("/gerenciar-camp", (req, res) => {
+  if (req.session.adm) {
+  console.log("GET /gerenciar-camp");
+  res.render("pages/gerenciar-camp", { titulo: "Gerenciador de Campanhas", req:req });
+  } else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }
+
+});
+
 app.get("/logout", (req, res) => {
   console.log("GET /logout");
   req.session.destroy(() => {

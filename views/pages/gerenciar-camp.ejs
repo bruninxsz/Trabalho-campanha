@@ -1,18 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <%- include("../partials/head") %>
 
 <body>
+
     <%- include("../partials/menu") %>
     <br>
-    <center>
-        <h1><font color="black">Tabela Geral</font></h1><br>
-        <main id="MainDash">
-        <%- include("../partials/usertable") %>
-        </main>
-    </center><br><br>
-    <%- include("../partials/footer") %>
-</body>
 
+    <h1 style="color: #333; text-align: center;">Gerenciador de Campanhas</h1>
+    <br>
+
+    <main style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 40px auto; max-width: 1200px;">
+
+        <!-- Card 1 -->
+        <div style="width: 300px; 
+                    background-color: #d0bdf4; 
+                    border-radius: 12px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+                    padding: 20px; 
+                    font-size: 1rem; 
+                    cursor: pointer; 
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;">
+            <h2 style="text-align: center; color: #333; margin-bottom: 15px;">Campanha 1</h2>
+            <p><strong>Nome:</strong> </p>
+            <p><strong>Data de criação:</strong> </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div style="width: 300px; 
+                    background-color: #d0bdf4; 
+                    border-radius: 12px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+                    padding: 20px; 
+                    font-size: 1rem; 
+                    cursor: pointer; 
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;">
+            <h2 style="text-align: center; color: #333; margin-bottom: 15px;">Campanha 2</h2>
+            <p><strong>Nome:</strong> </p>
+            <p><strong>Data de criação:</strong> </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div style="width: 300px; 
+                    background-color: #d0bdf4; 
+                    border-radius: 12px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+                    padding: 20px; 
+                    font-size: 1rem; 
+                    cursor: pointer; 
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;">
+            <h2 style="text-align: center; color: #333; margin-bottom: 15px;">Campanha 3</h2>
+            <p><strong>Nome:</strong> </p>
+            <p><strong>Data de criação:</strong> </p>
+        </div>
+
+    </main>
+
+    <br><br>
+    <%- include("../partials/footer") %>
+
+    <!-- CSS embutido -->
+    <style>
+        main div:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+
+</body>
 </html>
