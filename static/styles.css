@@ -6,15 +6,15 @@
   }
 
   body {
-    background: linear-gradient(to right, #999999, #b3b3b3, #cccccc, #ffffff);
-    color: #333;
+    background: linear-gradient(to right #e5eaf5);
+    color: #ffffff;
     line-height: 1.6;
     min-height: 100vh;
   }
   
 
   header {
-    background-color: rgb(42, 55, 142);
+    background-color: #d0bdf4;
     padding: 16px 32px;
     color: white;
     text-align: right;
@@ -94,7 +94,7 @@
     border-radius: 8px;
     width: 200px;
     max-width: 100%;
-    color: #0d0d80;
+    color: #ffffff;
     outline: none;
     transition: border 0.3s ease;
     display: inline-block;
@@ -105,22 +105,22 @@
     width: 25%;
     font-weight: bold;
     border-spacing: 0;
-    border: 3px solid #003366; 
+    border: 3px solid #8458B3; 
     border-radius: 10px;
-    background-color: #6699CC; 
+    background-color: #d0bdf4; 
     color: white;
 
   }
 
   .tabela-doacao th, .tabela-doacao td {
-  border: 2px solid #003366;
+  border: 2px solid #8458B3;
   padding: 10px;
   text-align: center;
 }
 
 .tabela-doacao th {
   text-align: center;
-  background-color: #336699;
+  background-color: #8458B3;
   font-weight: bold;
 }
 
@@ -129,7 +129,7 @@
   button {
     padding: 10px 20px;
     border: none;
-    background-color:rgb(42, 55, 142);
+    background-color:#8458B3;
     color: white;
     border-radius: 8px;
     font-size: 1rem;
@@ -139,7 +139,7 @@
   }
   
   button:hover {
-    background-color:rgb(33, 44, 115);
+    background-color:#774ea2;
     transform: scale(1.05);
   }
   
@@ -148,7 +148,7 @@
     position: sticky;
     top: 100vh;
     width: 100%;
-    background-color: rgb(42, 55, 142);
+    background-color:#d0bdf4;
     color: white;
     text-align: center;
     padding: 12px 0;
@@ -198,7 +198,7 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #444;
+    color: #ffff;
     text-align: justify;
   }
 
@@ -207,11 +207,11 @@
   font-size: 2.5rem;
   margin: 40px auto 20px;
   text-align: center;
-  color: #2a378e;
+  color: #8458B3;
 }
 
 .h1arrec{
-    color:rgb(0, 0, 0);
+    color:#000;
 }
 
 .formItens {
@@ -241,7 +241,7 @@
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  color: #0d0d80;
+  color: #000;
   transition: border-color 0.3s;
 }
 
@@ -253,7 +253,7 @@
 #btnEntrar {
   margin-top: 20px;
   padding: 12px 30px;
-  background-color: #2a378e;
+  background-color: #8458B3;
   border: none;
   color: white;
   border-radius: 8px;
@@ -264,7 +264,7 @@
 }
 
 #btnEntrar:hover {
-  background-color: #1e2a70;
+  background-color: #714c99;
 
 }
 
@@ -273,11 +273,11 @@
   text-align: center;
   margin-top: 20px;
   font-size: 1.2rem;
-  color: #007bff;
+  color: #000;
 }
 
 #cadastrar:hover {
-  color: #004b99;
+  color: #8458B3;
   text-decoration: underline;
 }
 
@@ -298,7 +298,7 @@
   margin-left:170px;
   display: block;
   padding: 10px 20px;
-  background-color: rgb(42, 55, 142);
+  background-color: #8458B3;
   color: white;
   border: none;
   border-radius: 8px;
@@ -311,5 +311,9 @@
 }
 
 .novarrec:hover {
-  background-color: rgb(33, 44, 115);
+  background-color: #8458B3;
+}
+
+.Psobre{
+  background-color: #d0bdf4;
 }
