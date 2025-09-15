@@ -22,16 +22,16 @@ const PORT = 8000;
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
    db.run(
-    "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
+    "Drop table users"
   )
   db.run(
-    "CREATE TABLE IF NOT EXISTS Pontuacao_Roupas (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTGER)"
+    "Drop table Pontuacao_Roupas"
   )
    db.run(
-    "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
+    "Drop table Turmas"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
+    "Drop table Arrecadacoes"
   );
   
 });
@@ -170,6 +170,35 @@ app.get("/cadastro", (req, res) => {
   console.log("GET /cadastro");
   res.render("pages/cadastro", { titulo: "Cadastro" });
 });
+
+app.get("/criacao_campanha", (req, res) => {
+ if (req.session.adm) {
+    console.log("GET /criacao_campanha");
+const query = "SELECT * FROM Turmas";
+const query2 = "SELECT * FROM Pontuacao_Roupas";
+
+// Primeiro obtemos os dados de ambas as tabelas
+db.all(query, [], (err, turmas) => {
+  if (err) throw err;
+  
+  db.all(query2, [], (err, pontuacoes) => {
+    if (err) throw err;
+    
+    // Só renderizamos a página quando temos todos os dados
+    res.render("pages/criacao_campanha", { 
+      titulo: "Nova Doação", 
+      req: req, 
+      turmas: turmas, 
+      pontuacoes: pontuacoes 
+    });
+  });
+});
+  } else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }
+});
+
 
 app.post("/cadastro", (req, res) => {
   console.log("POST /cadastro");

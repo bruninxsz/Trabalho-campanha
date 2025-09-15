@@ -12,9 +12,6 @@
     min-height: 100vh;
   }
   
-  h1{
-    color: #8458B3;
-  }
 
   header {
     background-color: #d0bdf4;
@@ -97,7 +94,7 @@
     border-radius: 8px;
     width: 200px;
     max-width: 100%;
-    color: #ffffff;
+    color: #000000;
     outline: none;
     transition: border 0.3s ease;
     display: inline-block;
