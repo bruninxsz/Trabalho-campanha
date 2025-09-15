@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<%- include("../partials/head") %>
+<%- include("../partials/menu") %>
+
+ <center>
+<head>
+  <meta charset="UTF-8">
+  <title color="aliceblue">Criação de Arrecadações</title>
+</head>
+
+<body>
+ 
+    <br><br>
+  <h1 class="h1arrec">Criação de Arrecadação</h1>
+  <br>
+
+    <form action="/criacao_arrecadao" method="post" class="envio" style="background-color: #d0bdf4">
+
+    
+<label for="titulo-arrecadacao">⠀Digite o Nome da arrecadação⠀⠀⠀</label>
+<input type="text" name="id_titulo-arrecadacao" id="id_titulo-arrecadacao" style="width: 200px;" placeholder="Digite a turma">
+<br><br>&nbsp;
+
+<label for="itens">Digite os itens arrecadadosㅤ⠀⠀⠀</label>
+<input type="text" name="id_itens" id="id_itens" style="width: 200px;" placeholder="Digite a roupa">
+<br><br>&nbsp;
+
+<label for="pontos">Digite a pontuação dos itensㅤ⠀⠀⠀</label>
+<input type="text" name="id_pontos" id="id_pontos" style="width: 200px;" placeholder="Digite a pontuação">
+<br><br>&nbsp;
+
+<button type="submit" class="novacamp">Enviar</button>
+
+  </form>
+</center>
+
+<br><br>
+<%- include("../partials/footer") %>
+</body>
+
+</html>
