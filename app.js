@@ -150,7 +150,7 @@ app.post("/login", (req, res) => {
       req.session.id_username = row.id;
       if(row.perfil == "ADM"){
       req.session.adm = true;
-      res.redirect("/dashboard");
+      res.redirect("/");
       }
       else{
       req.session.adm = false;
@@ -178,30 +178,28 @@ app.get("/cadastro", (req, res) => {
 app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
-const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
 
-// Primeiro obtemos os dados de ambas as tabelas
-db.all(query, [], (err, turmas) => {
-  if (err) throw err;
-  
-  db.all(query2, [], (err, pontuacoes) => {
-    if (err) throw err;
-    
-    // Só renderizamos a página quando temos todos os dados
     res.render("pages/criacao_campanha", { 
       titulo: "Nova Doação", 
-      req: req, 
-      turmas: turmas, 
-      pontuacoes: pontuacoes 
+      req: req
     });
-  });
-});
-  } else {
+  }else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
-  }
-});
+  }});
+
+  app.get("/criacao_itens", (req, res) => {
+ if (req.session.adm) {
+    console.log("GET /criacao_itens");
+    
+    res.render("pages/criacao_itens", { 
+      titulo: "Nova Doação", 
+      req: req
+    });
+  }else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }});
 
 
 app.post("/cadastro", (req, res) => {
