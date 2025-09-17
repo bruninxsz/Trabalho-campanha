@@ -188,7 +188,7 @@ app.get("/criacao_campanha", (req, res) => {
     res.redirect("/nao-autorizado");
   }});
 
-  app.get("/criacao_itens", (req, res) => {
+app.get("/criacao_itens", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_itens");
     
