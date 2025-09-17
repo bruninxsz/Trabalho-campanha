@@ -70,7 +70,7 @@ app.get("/nova-arrecadacao", (req, res) => {
  if (req.session.adm) {
     console.log("GET /nova-arrecadacao");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -99,14 +99,14 @@ app.post("/nova-arrecadacao", (req, res) => {
   // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
   //req.session.username, req.session.id
   if (req.session.adm) {
-    const {id_turma, id_roupa, qtd } = req.body;
-    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
+    const {id_turma, id_item, qtd } = req.body;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_item, qtd, data) VALUES (?, ? , ?, ?)`;
     const data = new Date();
     const data_atual = data.toLocaleDateString();
     console.log(JSON.stringify(req.body));
     console.log(JSON.stringify(data_atual));
     
-    db.get(query, [id_turma ,id_roupa, qtd, data_atual], (err, row) => {
+    db.get(query, [id_turma ,id_item, qtd, data_atual], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
       //1. Verificar se o usuário existe
       console.log(JSON.stringify(row));
@@ -258,10 +258,10 @@ app.get("/dashboard", (req, res) => {
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_item
     GROUP BY Turmas.id_turma
     ORDER BY pontos DESC;
   `;

@@ -18,7 +18,6 @@
 
     <form action="/nova-arrecadacao" method="post" class="envio" style="background-color: #d0bdf4">
 
-    
     <label for="turma">⠀Selecione uma turma:⠀⠀⠀</label>
     <select name="id_turma" id="id_turma" style="width: 200px;">
       <option value="">[Escolha]</option>
@@ -28,9 +27,9 @@
     </select>
     <br>
 
-    <br>&nbsp;
+    <br>&nbsp;  
 
-    <label for="roupas">Selecione a Roupa:ㅤ⠀⠀⠀</label>
+    <label for="itens">Selecione o item:ㅤ⠀⠀⠀⠀</label>
     <select name="id_roupa" id="id_roupa" style="width: 200px;">
       <option value="">[Escolha]</option>
       <% for (let i = 0; i < pontuacoes.length; i++) { %>
@@ -42,7 +41,7 @@
 <br>
     <br>&nbsp;
 
-    <label for="roupas">Selecione a quantidade:⠀</label>
+    <label for="quantidade">Selecione a quantidade:⠀</label>
     <select name="qtd" id="qtd" style="width: 200px;">
       <option value="">[Escolha]</option>
       <% for (let i = 1; i <= 15; i++) { %>
