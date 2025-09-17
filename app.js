@@ -171,8 +171,12 @@ app.get("/user-senha-invalido", (req, res) => {
 });
 
 app.get("/cadastro", (req, res) => {
+  if(req.session.adm){
   console.log("GET /cadastro");
   res.render("pages/cadastro", { titulo: "Cadastro" });
+  } else{
+    res.redirect("/nao-autorizado");
+  };
 });
 
 app.get("/criacao_campanha", (req, res) => {
@@ -203,6 +207,7 @@ app.get("/criacao_itens", (req, res) => {
 
 
 app.post("/cadastro", (req, res) => {
+  if(req.session.adm){
   console.log("POST /cadastro");
   console.log(JSON.stringify(req.body));
   const { username, password } = req.body;
@@ -231,7 +236,9 @@ app.post("/cadastro", (req, res) => {
         res.redirect("/usuario-cadastrado");
       });
     }
-  });
+  })}else{
+    res.redirect("/nao-autorizado");
+  };
 });
 
 app.get("/usuario-cadastrado", (req, res) => {
