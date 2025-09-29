@@ -67,10 +67,10 @@ app.get("/sobre", (req, res) => {
 });
 
 app.get("/nova-arrecadacao", (req, res) => {
- if (req.session.adm) {
+ if (req.session.adm || req.session.pro) {
     console.log("GET /nova-arrecadacao");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -98,9 +98,9 @@ app.post("/nova-arrecadacao", (req, res) => {
   console.log("POST /nova-arrecadacao");
   // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
   //req.session.username, req.session.id
-  if (req.session.adm) {
+  if (req.session.adm || req.session.pro) {
     const {id_turma, id_roupa, qtd } = req.body;
-    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data) VALUES (?, ? , ?, ?)`;
     const data = new Date();
     const data_atual = data.toLocaleDateString();
     console.log(JSON.stringify(req.body));
@@ -148,14 +148,26 @@ app.post("/login", (req, res) => {
       req.session.perfil = perfil;
       req.session.loggedin = true;
       req.session.id_username = row.id;
-      if(row.perfil == "ADM"){
-      req.session.adm = true;
-      res.redirect("/");
-      }
-      else{
-      req.session.adm = false;
-      res.redirect("/");
-      }
+
+      if (row.perfil === "ADM") {
+    req.session.adm = true;
+    req.session.pro = false;
+    req.session.usr = false;
+    } else if (row.perfil === "PRO") {
+    req.session.pro = true;
+    req.session.adm = false;
+    req.session.usr = false;
+    } else if (row.perfil === "USR") {
+    req.session.adm = false;
+    req.session.pro = false;
+    req.session.usr = true;
+  } else {
+    req.session.adm = false;
+    req.session.pro = false;
+    req.session.usr = false;
+  }
+
+res.redirect("/");
     } else {
       //3. Se não, executar processo de negação de login
       res.redirect("/user-senha-invalido");
@@ -252,16 +264,16 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  if(req.session.loggedin){
+  if(req.session.usr || req.session.adm || req.session.pro){
   const query = `
     SELECT 
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Item
     GROUP BY Turmas.id_turma
     ORDER BY pontos DESC;
   `;

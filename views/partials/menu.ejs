@@ -9,6 +9,9 @@
                 <li><a href="/criacao_campanha">CRIAR CAMPANHA</a></li>
                 <li><a href="/cadastro">CADASTRO</a></li>    
             <% } %>
+            <%if(req.session.pro){ %>
+                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
+            <% } %>
             <li><a href="/dashboard">TABELA DE ARRECADAÇÕES</a></li>
     <a href="/logout">Sair da Conta</a>
     <% } else { %>
