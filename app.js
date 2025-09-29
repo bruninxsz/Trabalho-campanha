@@ -20,6 +20,9 @@ const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
+const titulo = "Campanha do Agasalho";
+const conteudo = "Arrecadação de roupas para famílias carentes.";
+const ativo = 1; // 1 = ativa, 0 = inativa
 
 db.serialize(() => {
   db.run(
@@ -51,8 +54,47 @@ db.run(`
       ('N3F', 'Papel Higiênico (pacote)', 'arrecadação de produtos de higiene', 6, (6*4), date('now')),
       ('M3D', 'Escova de Dentes', 'arrecadação de produtos de higiene', 9, (9*2), date('now'));
   `);
+  db.serialize(() => {
+  // Usuário administrador
+  db.run(
+    "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+    ["adm", "adm123", 1, "ADM"],
+    function (err) {
+      if (err) {
+        console.error("Erro ao inserir administrador:", err.message);
+      } else {
+        console.log("Administrador inserido com sucesso! ID:", this.lastID);
+      }
+    }
+  );
+
+  // Usuário comum
+  db.run(
+    "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+    ["usuario", "usuario123", 1, "USR"],
+    function (err) {
+      if (err) {
+        console.error("Erro ao inserir usuário:", err.message);
+      } else {
+        console.log("Usuário comum inserido com sucesso! ID:", this.lastID);
+      }
+    }
+  );
+});
+db.run(
+  "INSERT INTO Campanhas (titulo, conteudo, ativo) VALUES (?, ?, ?)",
+  [titulo, conteudo, ativo],
+  function (err) {
+    if (err) {
+      console.error("Erro ao inserir campanha:", err.message);
+    } else {
+      console.log("Campanha inserida com sucesso! ID:", this.lastID);
+    }
+  }
+);
   
 });
+
 
 
 app.use(
