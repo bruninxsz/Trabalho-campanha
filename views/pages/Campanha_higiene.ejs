@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<%- include("../partials/head") %>
+<%- include("../partials/menu") %>
+
+<center>
+<head>
+  <meta charset="UTF-8">
+  <title><%= titulo %></title>
+</head>
+
+<body>
+  <br><br>
+  <h1 class="h1arrec"><%= titulo %></h1>
+  <br>
+
+  <table border="1" style="background-color: #d0bdf4; width: 90%; text-align: center;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Turma</th>
+        <th>Item</th>
+        <th>Campanha</th>
+        <th>Quantidade</th>
+        <th>Pontos</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (selectTurmas.length > 0) { %>
+        <% selectTurmas.forEach(function(row){ %>
+          <tr>
+            <td><%= row.id_arrecadacao %></td>
+            <td><%= row.turma %></td>
+            <td><%= row.Item %></td>
+            <td><%= row.Campanha %></td>
+            <td><%= row.qtd %></td>
+            <td><%= row.Pontos %></td>
+            <td><%= row.data %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="7">Nenhum registro encontrado</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</center>
+
+<br><br>
+<%- include("../partials/footer") %>
+</body>
+</html>

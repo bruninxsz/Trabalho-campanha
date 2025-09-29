@@ -20,6 +20,7 @@ const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
+
 db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTEGER, perfil TEXT(3))"
@@ -38,6 +39,19 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
   );
 
+  db.run(
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes_ficticio (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, turma TEXT, Item TEXT, Campanha TEXT, qtd INTEGER,  Pontos TEXT, data TEXT)"
+  );
+db.run(`
+    INSERT INTO Arrecadacoes_ficticio (turma, Item, Campanha, qtd, Pontos, data)
+    VALUES
+      ('M1A', 'Sabonete', 'arrecadação de produtos de higiene', 12, (12*2), date('now')),
+      ('T1B', 'Pasta de Dente', 'arrecadação de produtos de higiene', 7, (7*3), date('now')),
+      ('I1HS', 'Shampoo', 'arrecadação de produtos de higiene', 5, (5*5), date('now')),
+      ('N3F', 'Papel Higiênico (pacote)', 'arrecadação de produtos de higiene', 6, (6*4), date('now')),
+      ('M3D', 'Escova de Dentes', 'arrecadação de produtos de higiene', 9, (9*2), date('now'));
+  `);
+  
 });
 
 
@@ -71,7 +85,7 @@ app.get("/nova-arrecadacao", (req, res) => {
  if (req.session.adm) {
     console.log("GET /nova-arrecadacao");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -100,14 +114,14 @@ app.post("/nova-arrecadacao", (req, res) => {
   // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
   //req.session.username, req.session.id
   if (req.session.adm) {
-    const {id_turma, id_roupa, qtd } = req.body;
-    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
+    const {id_turma, id_Item, qtd } = req.body;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data) VALUES (?, ? , ?, ?)`;
     const data = new Date();
     const data_atual = data.toLocaleDateString();
     console.log(JSON.stringify(req.body));
     console.log(JSON.stringify(data_atual));
     
-    db.get(query, [id_turma ,id_roupa, qtd, data_atual], (err, row) => {
+    db.get(query, [id_turma ,id_Item, qtd, data_atual], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
       //1. Verificar se o usuário existe
       console.log(JSON.stringify(row));
@@ -180,7 +194,7 @@ app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -254,10 +268,10 @@ app.get("/dashboard", (req, res) => {
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Item
     GROUP BY Turmas.id_turma
     ORDER BY pontos DESC;
   `;
@@ -277,6 +291,64 @@ app.get("/dashboard", (req, res) => {
 }else {
   res.redirect("/nao-permitido")
 }});
+
+app.get("/Campanha_higiene", (req, res) => {
+  if (req.session.loggedin) {
+    const query = `
+      SELECT 
+        id_arrecadacao,
+        turma,
+        Item,
+        Campanha,
+        qtd,
+        Pontos,
+        data
+      FROM Arrecadacoes_ficticio
+    `;
+
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
+
+      res.render("pages/Campanha_higiene", {
+        titulo: "Campanhas",
+        selectTurmas: resultado,
+        req: req
+      });
+    });
+  } else {
+    res.redirect("/nao-permitido");
+  }
+});
+app.get("/Campanhas", (req, res) => {
+  if (req.session.loggedin) {
+    const query = `
+      SELECT 
+        id_Campanha,
+        titulo,
+        conteudo
+      FROM Campanhas
+    `;
+
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
+
+      res.render("pages/Campanhas", {
+        titulo: "Campanhas",
+        selectCampanhas: resultado,
+        req: req
+      });
+    });
+  } else {
+    res.redirect("/nao-permitido");
+  }
+});
+
 
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
