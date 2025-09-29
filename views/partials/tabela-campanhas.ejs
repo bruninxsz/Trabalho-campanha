@@ -1,0 +1,20 @@
+<table class="tabela-doacao">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Conteúdo</th>
+        <th>Ativo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let i = 0; i < selectCampanhas.length; i++) { %>
+        <tr>
+          <td><%= i + 1 %>°</td>
+          <td><%= selectCampanhas[i].titulo %></td>
+          <td><%= selectCampanhas[i].conteudo %></td>
+          <td><%= selectCampanhas[i].ativo %></td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>

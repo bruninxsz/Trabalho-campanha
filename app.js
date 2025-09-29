@@ -120,8 +120,8 @@ app.post("/nova-arrecadacao", (req, res) => {
 
 
 // Inicia o servidor
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+app.listen(8000, () => {
+  console.log('Servidor rodando em http://localhost:8000');
 });
 
 app.get("/login", (req, res) => {
@@ -251,19 +251,19 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
   });
 });
 
+
+
+  
 app.get("/dashboard", (req, res) => {
   if(req.session.loggedin){
   const query = `
     SELECT 
-      Turmas.id_turma,
-      Turmas.sigla,
-      Turmas.docente,
-      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
-    FROM Turmas
-    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_item
-    GROUP BY Turmas.id_turma
-    ORDER BY pontos DESC;
+      Campanhas.id_Campanha,
+      Campanhas.titulo,
+      Campanhas.conteudo
+    FROM Campanhas
+    GROUP BY Campanhas.id_Campanha;
+    ORDER BY id_Campanha;
   `;
 
   db.all(query, [], (err, resultado) => {
@@ -274,7 +274,7 @@ app.get("/dashboard", (req, res) => {
 
     res.render("pages/dashboard", {
       titulo: "Dashboard",
-      selectTurmas: resultado,
+      selectCampanhas: resultado,
       req: req
     });
   });
