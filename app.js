@@ -70,7 +70,7 @@ app.get("/nova-arrecadacao", (req, res) => {
  if (req.session.adm) {
     console.log("GET /nova-arrecadacao");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -99,14 +99,14 @@ app.post("/nova-arrecadacao", (req, res) => {
   // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
   //req.session.username, req.session.id
   if (req.session.adm) {
-    const {id_turma, id_roupa, qtd } = req.body;
-    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
+    const {id_turma, id_item, qtd } = req.body;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_item, qtd, data) VALUES (?, ? , ?, ?)`;
     const data = new Date();
     const data_atual = data.toLocaleDateString();
     console.log(JSON.stringify(req.body));
     console.log(JSON.stringify(data_atual));
     
-    db.get(query, [id_turma ,id_roupa, qtd, data_atual], (err, row) => {
+    db.get(query, [id_turma ,id_item, qtd, data_atual], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
       //1. Verificar se o usuário existe
       console.log(JSON.stringify(row));
@@ -120,8 +120,8 @@ app.post("/nova-arrecadacao", (req, res) => {
 
 
 // Inicia o servidor
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+app.listen(8000, () => {
+  console.log('Servidor rodando em http://localhost:8000');
 });
 
 app.get("/login", (req, res) => {
@@ -150,7 +150,7 @@ app.post("/login", (req, res) => {
       req.session.id_username = row.id;
       if(row.perfil == "ADM"){
       req.session.adm = true;
-      res.redirect("/dashboard");
+      res.redirect("/");
       }
       else{
       req.session.adm = false;
@@ -171,40 +171,43 @@ app.get("/user-senha-invalido", (req, res) => {
 });
 
 app.get("/cadastro", (req, res) => {
+  if(req.session.adm){
   console.log("GET /cadastro");
   res.render("pages/cadastro", { titulo: "Cadastro" });
+  } else{
+    res.redirect("/nao-autorizado");
+  };
 });
 
 app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
-const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
 
-// Primeiro obtemos os dados de ambas as tabelas
-db.all(query, [], (err, turmas) => {
-  if (err) throw err;
-  
-  db.all(query2, [], (err, pontuacoes) => {
-    if (err) throw err;
-    
-    // Só renderizamos a página quando temos todos os dados
     res.render("pages/criacao_campanha", { 
       titulo: "Nova Doação", 
-      req: req, 
-      turmas: turmas, 
-      pontuacoes: pontuacoes 
+      req: req
     });
-  });
-});
-  } else {
+  }else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
-  }
-});
+  }});
+
+app.get("/criacao_itens", (req, res) => {
+ if (req.session.adm) {
+    console.log("GET /criacao_itens");
+    
+    res.render("pages/criacao_itens", { 
+      titulo: "Nova Doação", 
+      req: req
+    });
+  }else {
+    tituloError = "Não Autorizado";
+    res.redirect("/nao-autorizado");
+  }});
 
 
 app.post("/cadastro", (req, res) => {
+  if(req.session.adm){
   console.log("POST /cadastro");
   console.log(JSON.stringify(req.body));
   const { username, password } = req.body;
@@ -233,7 +236,9 @@ app.post("/cadastro", (req, res) => {
         res.redirect("/usuario-cadastrado");
       });
     }
-  });
+  })}else{
+    res.redirect("/nao-autorizado");
+  };
 });
 
 app.get("/usuario-cadastrado", (req, res) => {
@@ -246,19 +251,19 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
   });
 });
 
+
+
+  
 app.get("/dashboard", (req, res) => {
   if(req.session.loggedin){
   const query = `
     SELECT 
-      Turmas.id_turma,
-      Turmas.sigla,
-      Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
-    FROM Turmas
-    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
-    GROUP BY Turmas.id_turma
-    ORDER BY pontos DESC;
+      Campanhas.id_Campanha,
+      Campanhas.titulo,
+      Campanhas.conteudo
+    FROM Campanhas
+    GROUP BY Campanhas.id_Campanha;
+    ORDER BY id_Campanha;
   `;
 
   db.all(query, [], (err, resultado) => {
@@ -269,7 +274,7 @@ app.get("/dashboard", (req, res) => {
 
     res.render("pages/dashboard", {
       titulo: "Dashboard",
-      selectTurmas: resultado,
+      selectCampanhas: resultado,
       req: req
     });
   });
