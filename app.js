@@ -29,7 +29,7 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTEGER, perfil TEXT(3))"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTEGER)"
+    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
   );
    db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
@@ -42,59 +42,52 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
   );
 
-  db.run(
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes_ficticio (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, turma TEXT, Item TEXT, Campanha TEXT, qtd INTEGER,  Pontos TEXT, data TEXT)"
-  );
-db.run(`
-    INSERT INTO Arrecadacoes_ficticio (turma, Item, Campanha, qtd, Pontos, data)
-    VALUES
-      ('M1A', 'Sabonete', 'arrecadação de produtos de higiene', 12, (12*2), date('now')),
-      ('T1B', 'Pasta de Dente', 'arrecadação de produtos de higiene', 7, (7*3), date('now')),
-      ('I1HS', 'Shampoo', 'arrecadação de produtos de higiene', 5, (5*5), date('now')),
-      ('N3F', 'Papel Higiênico (pacote)', 'arrecadação de produtos de higiene', 6, (6*4), date('now')),
-      ('M3D', 'Escova de Dentes', 'arrecadação de produtos de higiene', 9, (9*2), date('now'));
-  `);
+  
   db.serialize(() => {
   // Usuário administrador
-  db.run(
-    "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
-    ["adm", "adm123", 1, "ADM"],
-    function (err) {
-      if (err) {
-        console.error("Erro ao inserir administrador:", err.message);
-      } else {
-        console.log("Administrador inserido com sucesso! ID:", this.lastID);
-      }
-    }
-  );
+ async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
+    return new Promise((resolve, reject) => {
+        // Primeiro verifica se o usuário já existe
+        db.get(
+            "SELECT id FROM users WHERE username = ?",
+            [username],
+            function (err, row) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                
+                if (row) {
+                    console.log(`${tipo} já existe no banco de dados.`);
+                    resolve(false);
+                } else {
+                    // Se não existe, faz o insert
+                    db.run(
+                        "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+                        [username, password, ativo, perfil],
+                        function (err) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
+                                resolve(true);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    });
+}
 
-  // Usuário comum
-  db.run(
-    "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
-    ["usuario", "usuario123", 1, "USR"],
-    function (err) {
-      if (err) {
-        console.error("Erro ao inserir usuário:", err.message);
-      } else {
-        console.log("Usuário comum inserido com sucesso! ID:", this.lastID);
-      }
-    }
-  );
-});
-db.run(
-  "INSERT INTO Campanhas (titulo, conteudo, ativo) VALUES (?, ?, ?)",
-  [titulo, conteudo, ativo],
-  function (err) {
-    if (err) {
-      console.error("Erro ao inserir campanha:", err.message);
-    } else {
-      console.log("Campanha inserida com sucesso! ID:", this.lastID);
-    }
-  }
-);
-  
-});
+// Uso
+inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
+    .catch(err => console.error("Erro:", err.message));
 
+inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
+    .catch(err => console.error("Erro:", err.message));
+});  
+});
 
 
 app.use(
@@ -176,6 +169,72 @@ app.post("/nova-arrecadacao", (req, res) => {
 });
 
 
+ app.get("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("GET /criacao_Pontuacao_Itens");
+  if (req.session.adm) {
+    // Envia o formulário HTML
+    res.send(`
+      <!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastrar Item</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Cadastrar Novo Item</h2>
+    <form action="/criacao_Pontuacao_Itens" method="POST">
+        <label>Descrição:</label>
+        <input type="text" name="Descricao" placeholder="Digite a descrição" required>
+        <br><br>
+        <label>ID Campanha:</label>
+        <input type="number" name="id_campanhas" placeholder="Digite o ID da campanha" required>
+        <br><br>
+        <label>Pontos:</label>
+        <input type="number" name="pontos" placeholder="Digite os pontos" required>
+        <br><br>
+        <button type="submit">Cadastrar Item</button>
+    </form>
+    <br>
+    <a href="/item-cadastrado">Ver itens cadastrados</a>
+</body>
+</html>
+    `);
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
+
+app.post("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("POST /criacao_Pontuacao_Itens");
+  
+  if (req.session.adm) {
+    const { Descricao, id_campanhas, pontos } = req.body;
+    
+    console.log("Dados do formulário:", { Descricao, id_campanhas, pontos });
+    
+    // Validação dos dados
+    if (!Descricao || !id_campanhas || !pontos) {
+      console.error("Dados faltando!");
+      return res.redirect("/erro-cadastro-item");
+    }
+    
+    const query = `INSERT INTO Pontuacao_Itens (Descricao, id_campanha, pontos) VALUES (?, ?, ?)`;
+    
+    db.run(query, [Descricao, id_campanhas, pontos], function(err) {
+      if (err) {
+        console.error("Erro ao inserir item:", err);
+        return res.redirect("/erro-cadastro-item");
+      }
+      
+      console.log(`Item inserido com ID: ${this.lastID}`);
+      // Redireciona para uma página de sucesso
+      res.redirect("/item-cadastrado");
+    });
+  
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
 // Inicia o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
