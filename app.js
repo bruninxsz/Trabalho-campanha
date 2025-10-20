@@ -230,7 +230,7 @@ app.post("/criacao_campanha", (req, res) => {
           if (err) throw err;
 
           console.log(`Campanha ${titulo} cadastrada com sucesso`);
-          res.redirect("/usuario-cadastrado");
+          res.redirect("/campanhas_ativas");
         });
       }
     });
@@ -258,7 +258,7 @@ app.get("/campanhas_ativas", (req, res) => {
       return res.status(500).send("Erro no servidor");
     }
 
-    res.render("pages/campanhas-ativas", {
+    res.render("pages/campanhas_ativas", {
       titulo: "Campanhas ativas",
       selectCampanhas: campanhas_ativas,
       req: req
