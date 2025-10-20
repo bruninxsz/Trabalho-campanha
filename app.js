@@ -196,13 +196,74 @@ app.get("/criacao_campanha", (req, res) => {
     console.log("GET /criacao_campanha");
 
     res.render("pages/criacao_campanha", { 
-      titulo: "Nova Doação", 
+      titulo: "Nova Campanha", 
       req: req
     });
   }else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
   }});
+
+app.post("/criacao_campanha", (req, res) => {
+  if(req.session.adm){
+  console.log("POST /criacao_campanha");
+  console.log(JSON.stringify(req.body));
+  const { titulo, conteudo } = req.body;
+
+  const query1 = `SELECT * FROM Campanhas`;
+  const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo) VALUES (? , ?, ?)`;
+  const ativo = 1;
+  db.get(query1, [titulo], (err, row) => {
+    if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+
+    //1. Verificar se o usuário existe
+    console.log(JSON.stringify(row));
+    if (row) {
+      //2. Se o usuário existir Negar o Cadastro
+      console.log(`Campanha ${titulo} já cadastrada`);
+      res.redirect("/usuario-ja-cadastrado");
+    } else {
+      //3. Se não, fazer o insert
+      db.get(query2, [titulo, conteudo, ativo], (err, row) => {
+        if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+
+        //1. Verificar se a campanha existe
+        console.log(JSON.stringify(row));
+        console.log(`Campanha ${titulo} cadastrada com sucesso`);
+        res.redirect("/usuario-cadastrado");
+      });
+    }
+  })}else{
+    res.redirect("/nao-autorizado");
+  };
+});
+
+app.get("/campanhas_ativas", (req, res) => {
+  
+  const query = `
+    SELECT 
+      Campanhas.id_Campanha,
+      Campanhas.titulo,
+      Campanhas.conteudo,
+      Campanhas.ativo AS campanhas_ativas
+    FROM Campanhas
+    where Campanhas.ativo = 1;
+    ORDER BY pontos DESC;
+  `;
+
+  db.all(query, [], (err, campanhas_ativas) => {
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+
+    res.render("pages/campanhas-ativas", {
+      titulo: "Campanhas ativas",
+      selectCampanhas: campanhas_ativas,
+      req: req
+    });
+  });
+});
 
 app.get("/criacao_itens", (req, res) => {
  if (req.session.adm) {
@@ -216,7 +277,6 @@ app.get("/criacao_itens", (req, res) => {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
   }});
-
 
 app.post("/cadastro", (req, res) => {
   if(req.session.adm){
