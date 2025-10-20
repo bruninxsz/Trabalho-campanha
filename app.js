@@ -20,8 +20,8 @@ const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
-const titulo = "Campanha do Agasalho";
-const conteudo = "Arrecadação de roupas para famílias carentes.";
+const titulo = "Campanha de higiene";
+const conteudo = "Arrecadação de itens de higiene para pessoas carentes.";
 const ativo = 1; // 1 = ativa, 0 = inativa
 
 db.serialize(() => {
