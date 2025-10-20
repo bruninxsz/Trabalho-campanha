@@ -15,11 +15,16 @@ app.use(cors({
   origin: "https://www.bing.com/"
 }))
 app.use(bodyParser.json({ limit: "3mb" }))
+app.use(bodyParser.json({ limit: "3mb" }))
 
 const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
+const titulo = "Campanha de higiene";
+const conteudo = "Arrecadação de itens de higiene para pessoas carentes.";
+const ativo = 1; // 1 = ativa, 0 = inativa
+
 db.serialize(() => {
 
   db.run(
@@ -63,10 +68,29 @@ app.get("/sobre", (req, res) => {
 
 app.get("/nova-arrecadacao", (req, res) => {
   if (req.session.adm || req.session.pro) {
+  if (req.session.adm || req.session.pro) {
     console.log("GET /nova-arrecadacao");
     const query = "SELECT * FROM Turmas";
     const query2 = "SELECT * FROM Pontuacao_Itens";
+    const query = "SELECT * FROM Turmas";
+    const query2 = "SELECT * FROM Pontuacao_Itens";
 
+    // Primeiro obtemos os dados de ambas as tabelas
+    db.all(query, [], (err, turmas) => {
+      if (err) throw err;
+
+      db.all(query2, [], (err, pontuacoes) => {
+        if (err) throw err;
+
+        // Só renderizamos a página quando temos todos os dados
+        res.render("pages/nova-arrecadacao", {
+          titulo: "Nova Doação",
+          req: req,
+          turmas: turmas,
+          pontuacoes: pontuacoes
+        });
+      });
+    });
     // Primeiro obtemos os dados de ambas as tabelas
     db.all(query, [], (err, turmas) => {
       if (err) throw err;
@@ -96,10 +120,15 @@ app.post("/nova-arrecadacao", (req, res) => {
   if (req.session.adm || req.session.pro) {
     const { id_turma, id_roupa, qtd } = req.body;
     const query = `INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data) VALUES (?, ? , ?, ?)`;
+  if (req.session.adm || req.session.pro) {
+    const { id_turma, id_roupa, qtd } = req.body;
+    const query = `INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data) VALUES (?, ? , ?, ?)`;
     const data = new Date();
     const data_atual = data.toLocaleDateString();
     console.log(JSON.stringify(req.body));
     console.log(JSON.stringify(data_atual));
+
+    db.get(query, [id_turma, id_roupa, qtd, data_atual], (err, row) => {
 
     db.get(query, [id_turma, id_roupa, qtd, data_atual], (err, row) => {
       if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
@@ -108,12 +137,79 @@ app.post("/nova-arrecadacao", (req, res) => {
       res.redirect("/nova-arrecadacao")
     });
 
+
   } else {
     res.redirect("/nao-autorizado");
   }
 });
 
 
+ app.get("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("GET /criacao_Pontuacao_Itens");
+  if (req.session.adm) {
+    // Envia o formulário HTML
+    res.send(`
+      <!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastrar Item</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Cadastrar Novo Item</h2>
+    <form action="/criacao_Pontuacao_Itens" method="POST">
+        <label>Descrição:</label>
+        <input type="text" name="Descricao" placeholder="Digite a descrição" required>
+        <br><br>
+        <label>ID Campanha:</label>
+        <input type="number" name="id_campanhas" placeholder="Digite o ID da campanha" required>
+        <br><br>
+        <label>Pontos:</label>
+        <input type="number" name="pontos" placeholder="Digite os pontos" required>
+        <br><br>
+        <button type="submit">Cadastrar Item</button>
+    </form>
+    <br>
+    <a href="/item-cadastrado">Ver itens cadastrados</a>
+</body>
+</html>
+    `);
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
+
+app.post("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("POST /criacao_Pontuacao_Itens");
+  
+  if (req.session.adm) {
+    const { Descricao, id_campanhas, pontos } = req.body;
+    
+    console.log("Dados do formulário:", { Descricao, id_campanhas, pontos });
+    
+    // Validação dos dados
+    if (!Descricao || !id_campanhas || !pontos) {
+      console.error("Dados faltando!");
+      return res.redirect("/erro-cadastro-item");
+    }
+    
+    const query = `INSERT INTO Pontuacao_Itens (Descricao, id_campanha, pontos) VALUES (?, ?, ?)`;
+    
+    db.run(query, [Descricao, id_campanhas, pontos], function(err) {
+      if (err) {
+        console.error("Erro ao inserir item:", err);
+        return res.redirect("/erro-cadastro-item");
+      }
+      
+      console.log(`Item inserido com ID: ${this.lastID}`);
+      // Redireciona para uma página de sucesso
+      res.redirect("/item-cadastrado");
+    });
+  
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
 // Inicia o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
@@ -129,6 +225,7 @@ app.post("/login", (req, res) => {
   console.log("POST /login");
   console.log(JSON.stringify(req.body));
   const { username, password, perfil } = req.body;
+  const { username, password, perfil } = req.body;
 
   const query = `SELECT * FROM users WHERE username=? AND password=?`;
 
@@ -143,6 +240,25 @@ app.post("/login", (req, res) => {
       req.session.perfil = perfil;
       req.session.loggedin = true;
       req.session.id_username = row.id;
+
+      if (row.perfil === "ADM") {
+        req.session.adm = true;
+        req.session.pro = false;
+        req.session.usr = false;
+      } else if (row.perfil === "PRO") {
+        req.session.pro = true;
+        req.session.adm = false;
+        req.session.usr = false;
+      } else if (row.perfil === "USR") {
+        req.session.adm = false;
+        req.session.pro = false;
+        req.session.usr = true;
+      } else {
+        req.session.adm = false;
+        req.session.pro = false;
+        req.session.usr = false;
+      }
+
 
       if (row.perfil === "ADM") {
         req.session.adm = true;
@@ -182,18 +298,26 @@ app.get("/cadastro", (req, res) => {
     console.log("GET /cadastro");
     res.render("pages/cadastro", { titulo: "Cadastro" });
   } else {
+  if (req.session.adm) {
+    console.log("GET /cadastro");
+    res.render("pages/cadastro", { titulo: "Cadastro" });
+  } else {
     res.redirect("/nao-autorizado");
   };
 });
 
 app.get("/criacao_campanha", (req, res) => {
   if (req.session.adm) {
+  if (req.session.adm) {
     console.log("GET /criacao_campanha");
 
     res.render("pages/criacao_campanha", {
       titulo: "Nova Campanha",
+    res.render("pages/criacao_campanha", {
+      titulo: "Nova Campanha",
       req: req
     });
+  } else {
   } else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
@@ -263,15 +387,22 @@ app.get("/campanhas_ativas", (req, res) => {
 
 app.get("/criacao_itens", (req, res) => {
   if (req.session.adm) {
+  if (req.session.adm) {
     console.log("GET /criacao_itens");
+
+    res.render("pages/criacao_itens", {
+      titulo: "Nova Doação",
 
     res.render("pages/criacao_itens", {
       titulo: "Nova Doação",
       req: req
     });
   } else {
+  } else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
+  }
+});
   }
 });
 
@@ -280,7 +411,17 @@ app.post("/cadastro", (req, res) => {
     console.log("POST /cadastro");
     console.log(JSON.stringify(req.body));
     const { username, password } = req.body;
+  if (req.session.adm) {
+    console.log("POST /cadastro");
+    console.log(JSON.stringify(req.body));
+    const { username, password } = req.body;
 
+    const query1 = `SELECT * FROM users WHERE username=?`;
+    const query2 = `INSERT INTO users (username, password, ativo, perfil) VALUES (? , ?, ?, ?)`;
+    const ativo = 1;
+    const perfil = "USR";
+    db.get(query1, [username], (err, row) => {
+      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
     const query1 = `SELECT * FROM users WHERE username=?`;
     const query2 = `INSERT INTO users (username, password, ativo, perfil) VALUES (? , ?, ?, ?)`;
     const ativo = 1;
@@ -298,7 +439,25 @@ app.post("/cadastro", (req, res) => {
         //3. Se não, fazer o insert
         db.get(query2, [username, password, ativo, perfil], (err, row) => {
           if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
+      //1. Verificar se o usuário existe
+      console.log(JSON.stringify(row));
+      if (row) {
+        //2. Se o usuário existir Negar o Cadastro
+        console.log(`Usuario ${username} já cadastrado`);
+        res.redirect("/usuario-ja-cadastrado");
+      } else {
+        //3. Se não, fazer o insert
+        db.get(query2, [username, password, ativo, perfil], (err, row) => {
+          if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
 
+          //1. Verificar se o usuário existe
+          console.log(JSON.stringify(row));
+          console.log(`Usuário ${username} cadastrado com sucesso`);
+          res.redirect("/usuario-cadastrado");
+        });
+      }
+    })
+  } else {
           //1. Verificar se o usuário existe
           console.log(JSON.stringify(row));
           console.log(`Usuário ${username} cadastrado com sucesso`);
@@ -329,13 +488,20 @@ app.get("/dashboard", (req, res) => {
       Turmas.sigla,
       Turmas.docente,
       IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Item
     LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Item
     GROUP BY Turmas.id_turma
     ORDER BY pontos DESC;
   `;
 
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
     db.all(query, [], (err, resultado) => {
       if (err) {
         console.error("Erro no banco:", err);
@@ -373,6 +539,8 @@ app.get("/logout", (req, res) => {
 app.use("/{*erro}", (req, res) => {
   // Envia uma resposta de erro 404
   res
+    .status(404)
+    .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
     .status(404)
     .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
 });

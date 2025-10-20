@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<%- include("../partials/head") %>
+
+<body>
+    <%- include("../partials/menu") %>
+    <br>
+    <center>
+        <h1><font color="black">Tabela Campanhas</font></h1><br>
+        <main id="MainDash">
+            <table border="1" style="background-color: #d0bdf4; width: 80%; text-align: center;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Conteúdo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (selectCampanhas.length > 0) { %>
+                        <% selectCampanhas.forEach(function(row){ %>
+                            <tr>
+                                <td><%= row.id_Campanha %></td>
+                                <td><%= row.titulo %></td>
+                                <td><%= row.conteudo %></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="3">Nenhum registro encontrado</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </main>
+    </center>
+    <br><br>
+    <%- include("../partials/footer") %>
+</body>
+
+</html>
