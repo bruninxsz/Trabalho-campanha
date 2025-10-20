@@ -5,15 +5,11 @@
             <li><a href="/sobre">SOBRE</a></li>
             <% if(req.session.loggedin) { %>
             <% if(req.session.adm){ %>
-                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
-                <li><a href="/criacao_campanha">CRIAR CAMPANHA</a></li>
-                <li><a href="/cadastro">CADASTRO</a></li>    
-            <% } %>
-            <%if(req.session.pro){ %>
-                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li>
-            <% } %>
-                <li><a href="/campanhas_ativas">CAMPANHAS ATIVAS</a></li>
+                <li><a href="/nova-arrecadacao">NOVA ARRECADAÇÃO</a></li> 
+                <li><a href="/criacao_Pontuacao_Itens">CADASTRAR PRODUTOS</a></li>   
+            <% } %>   
             <li><a href="/dashboard">TABELA DE ARRECADAÇÕES</a></li>
+            <li><a href="/Campanhas">Campanhas</a></li>
     <a href="/logout">Sair da Conta</a>
     <% } else { %>
        <li> <a href="/login">LOGIN</a> </li>

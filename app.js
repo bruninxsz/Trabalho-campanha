@@ -20,25 +20,80 @@ const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
+const titulo = "Campanha de higiene";
+const conteudo = "Arrecadação de itens de higiene para pessoas carentes.";
+const ativo = 1; // 1 = ativa, 0 = inativa
+
 db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTEGER, perfil TEXT(3))"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTEGER)"
+    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
   );
-  db.run(
+   db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data TEXT)"
     "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data TEXT)"
   );
 
   db.run(
     "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
   );
+ 
+  db.run(
+    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
+  );
 
+  
+  db.serialize(() => {
+  // Usuário administrador
+ async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
+    return new Promise((resolve, reject) => {
+        // Primeiro verifica se o usuário já existe
+        db.get(
+            "SELECT id FROM users WHERE username = ?",
+            [username],
+            function (err, row) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                
+                if (row) {
+                    console.log(`${tipo} já existe no banco de dados.`);
+                    resolve(false);
+                } else {
+                    // Se não existe, faz o insert
+                    db.run(
+                        "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+                        [username, password, ativo, perfil],
+                        function (err) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
+                                resolve(true);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    });
+}
+
+// Uso
+inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
+    .catch(err => console.error("Erro:", err.message));
+
+inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
+    .catch(err => console.error("Erro:", err.message));
+});  
 });
+
 
 app.use(
   session({
@@ -119,6 +174,72 @@ app.post("/nova-arrecadacao", (req, res) => {
 });
 
 
+ app.get("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("GET /criacao_Pontuacao_Itens");
+  if (req.session.adm) {
+    // Envia o formulário HTML
+    res.send(`
+      <!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastrar Item</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Cadastrar Novo Item</h2>
+    <form action="/criacao_Pontuacao_Itens" method="POST">
+        <label>Descrição:</label>
+        <input type="text" name="Descricao" placeholder="Digite a descrição" required>
+        <br><br>
+        <label>ID Campanha:</label>
+        <input type="number" name="id_campanhas" placeholder="Digite o ID da campanha" required>
+        <br><br>
+        <label>Pontos:</label>
+        <input type="number" name="pontos" placeholder="Digite os pontos" required>
+        <br><br>
+        <button type="submit">Cadastrar Item</button>
+    </form>
+    <br>
+    <a href="/item-cadastrado">Ver itens cadastrados</a>
+</body>
+</html>
+    `);
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
+
+app.post("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("POST /criacao_Pontuacao_Itens");
+  
+  if (req.session.adm) {
+    const { Descricao, id_campanhas, pontos } = req.body;
+    
+    console.log("Dados do formulário:", { Descricao, id_campanhas, pontos });
+    
+    // Validação dos dados
+    if (!Descricao || !id_campanhas || !pontos) {
+      console.error("Dados faltando!");
+      return res.redirect("/erro-cadastro-item");
+    }
+    
+    const query = `INSERT INTO Pontuacao_Itens (Descricao, id_campanha, pontos) VALUES (?, ?, ?)`;
+    
+    db.run(query, [Descricao, id_campanhas, pontos], function(err) {
+      if (err) {
+        console.error("Erro ao inserir item:", err);
+        return res.redirect("/erro-cadastro-item");
+      }
+      
+      console.log(`Item inserido com ID: ${this.lastID}`);
+      // Redireciona para uma página de sucesso
+      res.redirect("/item-cadastrado");
+    });
+  
+  } else {
+    res.redirect("/acesso-nao-autorizado");
+  }
+});
 // Inicia o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
@@ -357,6 +478,64 @@ app.get("/dashboard", (req, res) => {
     res.redirect("/nao-permitido")
   }
 });
+
+app.get("/Campanha_higiene", (req, res) => {
+  if (req.session.loggedin) {
+    const query = `
+      SELECT 
+        id_arrecadacao,
+        turma,
+        Item,
+        Campanha,
+        qtd,
+        Pontos,
+        data
+      FROM Arrecadacoes_ficticio
+    `;
+
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
+
+      res.render("pages/Campanha_higiene", {
+        titulo: "Campanhas",
+        selectTurmas: resultado,
+        req: req
+      });
+    });
+  } else {
+    res.redirect("/nao-permitido");
+  }
+});
+app.get("/Campanhas", (req, res) => {
+  if (req.session.loggedin) {
+    const query = `
+      SELECT 
+        id_Campanha,
+        titulo,
+        conteudo
+      FROM Campanhas
+    `;
+
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
+
+      res.render("pages/Campanhas", {
+        titulo: "Campanhas",
+        selectCampanhas: resultado,
+        req: req
+      });
+    });
+  } else {
+    res.redirect("/nao-permitido");
+  }
+});
+
 
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
