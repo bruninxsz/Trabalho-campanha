@@ -28,11 +28,11 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data TEXT)"
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data INTEGER)"
   );
 
   db.run(
-    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
+    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, diasFaltando INTEGER, data_termino INTEGER, data_inicio INTEGER, ativo INTEGER)"
   );
   
   db.serialize(() => {
@@ -220,7 +220,7 @@ app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -248,12 +248,18 @@ app.post("/criacao_campanha", (req, res) => {
   if (req.session.adm) {
     console.log("POST /criacao_campanha");
     console.log(JSON.stringify(req.body));
-    const { titulo, conteudo, inicio, termino} = req.body;
-    const data_inicio = new Date(inicio);
-    const data_termino = new Date(termino);
-    const hoje = new Date();
+    const inicio = req.body.inicio; // "2025-05-10"
+    const termino = req.body.termino;       // "2025-06-20"
+
+    // transformar em timestamp (segundos)
+    const data_inicio = Math.floor(new Date(inicio).getTime() / 1000);
+    const data_termino = Math.floor(new Date(termino).getTime() / 1000);
+
+    const diff = data_termino - data_inicio;
+    const diasFaltando = Math.floor(diff / (1000 * 60 * 60 * 24));
+
     const query1 = `SELECT * FROM Campanhas WHERE titulo=?`;
-    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo) VALUES (? , ?, ?)`;
+    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando) VALUES (? , ?, ?, ?)`;
     const ativo = 1;
     // Consulta se a campanha já existe
     db.get(query1, [titulo], (err, row) => {
@@ -329,11 +335,11 @@ app.get("/dashboard", (req, res) => {
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
-    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
-    GROUP BY Turmas.id_turma
+    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_Item
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Roupa
+    GROUP BY Turmas.id_Item
     ORDER BY pontos DESC;
   `;
 
