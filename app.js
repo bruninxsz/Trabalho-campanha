@@ -24,13 +24,17 @@ db.serialize(() => {
    db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
   )
+<<<<<<< HEAD
   db.run(
     "CREATE TABLE IF NOT EXISTS Pontuacao_Roupas (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTGER)"
   )
+=======
+>>>>>>> Lucas_Netto
    db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
+<<<<<<< HEAD
     "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
   );
 
@@ -38,6 +42,59 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER, data TEXT)"
   );
 
+=======
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data INTEGER)"
+  );
+
+  db.run(
+    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, diasFaltando INTEGER, data_termino INTEGER, data_inicio INTEGER, ativo INTEGER)"
+  );
+  
+  db.serialize(() => {
+  // Usuário administrador
+ async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
+    return new Promise((resolve, reject) => {
+        // Primeiro verifica se o usuário já existe
+        db.get(
+            "SELECT id FROM users WHERE username = ?",
+            [username],
+            function (err, row) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                
+                if (row) {
+                    console.log(`${tipo} já existe no banco de dados.`);
+                    resolve(false);
+                } else {
+                    // Se não existe, faz o insert
+                    db.run(
+                        "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+                        [username, password, ativo, perfil],
+                        function (err) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
+                                resolve(true);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    });
+}
+
+// Uso
+inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
+    .catch(err => console.error("Erro:", err.message));
+
+inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
+    .catch(err => console.error("Erro:", err.message));
+});  
+>>>>>>> Lucas_Netto
 });
 
 app.use(
@@ -178,7 +235,11 @@ app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
 const query = "SELECT * FROM Turmas";
+<<<<<<< HEAD
 const query2 = "SELECT * FROM Pontuacao_Roupas";
+=======
+const query2 = "SELECT * FROM Pontuacao_Itens";
+>>>>>>> Lucas_Netto
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -206,10 +267,18 @@ app.post("/criacao_campanha", (req, res) => {
   if (req.session.adm) {
     console.log("POST /criacao_campanha");
     console.log(JSON.stringify(req.body));
-    const { titulo, conteudo } = req.body;
+    const inicio = req.body.inicio; // "2025-05-10"
+    const termino = req.body.termino;       // "2025-06-20"
+
+    // transformar em timestamp (segundos)
+    const data_inicio = Math.floor(new Date(inicio).getTime() / 1000);
+    const data_termino = Math.floor(new Date(termino).getTime() / 1000);
+
+    const diff = data_termino - data_inicio;
+    const diasFaltando = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     const query1 = `SELECT * FROM Campanhas WHERE titulo=?`;
-    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo) VALUES (? , ?, ?)`;
+    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando) VALUES (? , ?, ?, ?)`;
     const ativo = 1;
     // Consulta se a campanha já existe
     db.get(query1, [titulo], (err, row) => {
@@ -287,9 +356,15 @@ app.get("/dashboard", (req, res) => {
       Turmas.docente,
       IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
+<<<<<<< HEAD
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
     LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
     GROUP BY Turmas.id_turma
+=======
+    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_Item
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Roupa
+    GROUP BY Turmas.id_Item
+>>>>>>> Lucas_Netto
     ORDER BY pontos DESC;
   `;
 
