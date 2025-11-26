@@ -83,7 +83,7 @@ db.serialize(() => {
 inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
     .catch(err => console.error("Erro:", err.message));
 
-inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
+    inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
     .catch(err => console.error("Erro:", err.message));
 });  
 });
