@@ -24,25 +24,10 @@ db.serialize(() => {
    db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
   )
-<<<<<<< HEAD
-  db.run(
-    "CREATE TABLE IF NOT EXISTS Pontuacao_Roupas (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, pontos INTGER)"
-  )
-=======
->>>>>>> Lucas_Netto
    db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
-<<<<<<< HEAD
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Roupa, qtd INTEGER, data TEXT)"
-  );
-
-  db.run(
-    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER, data TEXT)"
-  );
-
-=======
     "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data INTEGER)"
   );
 
@@ -94,8 +79,8 @@ inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
 inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
     .catch(err => console.error("Erro:", err.message));
 });  
->>>>>>> Lucas_Netto
 });
+
 
 app.use(
   session({
@@ -235,11 +220,7 @@ app.get("/criacao_campanha", (req, res) => {
  if (req.session.adm) {
     console.log("GET /criacao_campanha");
 const query = "SELECT * FROM Turmas";
-<<<<<<< HEAD
-const query2 = "SELECT * FROM Pontuacao_Roupas";
-=======
 const query2 = "SELECT * FROM Pontuacao_Itens";
->>>>>>> Lucas_Netto
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -354,17 +335,11 @@ app.get("/dashboard", (req, res) => {
       Turmas.id_turma,
       Turmas.sigla,
       Turmas.docente,
-      IFNULL(SUM(Pontuacao_Roupas.pontos * Arrecadacoes.qtd), 0) AS pontos
+      IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
-<<<<<<< HEAD
-    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
-    LEFT JOIN Pontuacao_Roupas ON Pontuacao_Roupas.id = Arrecadacoes.id_Roupa
-    GROUP BY Turmas.id_turma
-=======
     LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_Item
     LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Roupa
     GROUP BY Turmas.id_Item
->>>>>>> Lucas_Netto
     ORDER BY pontos DESC;
   `;
 
