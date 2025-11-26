@@ -21,7 +21,7 @@ const PORT = 8000;
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
-   db.run(
+db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
   )
    db.run(
@@ -279,45 +279,43 @@ db.all(query, [], (err, turmas) => {
 });
 
 app.post("/criacao_campanha", (req, res) => {
-  if (req.session.adm) {
-    console.log("POST /criacao_campanha");
-    console.log(JSON.stringify(req.body));
-    const inicio = req.body.inicio; // "2025-05-10"
-    const termino = req.body.termino;       // "2025-06-20"
+  if (!req.session.adm) return res.redirect("/nao-autorizado");
 
-    // transformar em timestamp (segundos)
-    const data_inicio = Math.floor(new Date(inicio).getTime() / 1000);
-    const data_termino = Math.floor(new Date(termino).getTime() / 1000);
+  console.log("POST /criacao_campanha");
+  console.log(JSON.stringify(req.body));
 
-    const diff = data_termino - data_inicio;
-    const diasFaltando = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const { titulo, conteudo, inicio, termino } = req.body;
 
-    const query1 = `SELECT * FROM Campanhas WHERE titulo=?`;
-    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando) VALUES (?, ?, ?, ?, ?, ?)`;
-    const ativo = 1;
-    // Consulta se a campanha já existe
-    db.get(query1, [titulo], (err, row) => {
+  const data_inicio = Math.floor(new Date(inicio).getTime() / 1000);
+  const data_termino = Math.floor(new Date(termino).getTime() / 1000);
+
+  const diff = data_termino - data_inicio;
+  const diasFaltando = Math.floor(diff / (60 * 60 * 24)); // agora correto
+  req.session.fim = diasFaltando;
+  const query1 = `SELECT * FROM Campanhas WHERE titulo = ?`;
+  const query2 = `
+    INSERT INTO Campanhas 
+    (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  const ativo = 1;
+
+  db.get(query1, [titulo], (err, row) => {
+    if (err) throw err;
+
+    if (row) {
+      console.log(`Campanha ${titulo} já cadastrada`);
+      return res.redirect("/usuario-ja-cadastrado");
+    }
+
+    db.run(query2, [titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando], function (err) {
       if (err) throw err;
 
-      console.log(JSON.stringify(row));
-
-      if (row) {
-        // Já existe -> impede o cadastro
-        console.log(`Campanha ${titulo} já cadastrada`);
-        res.redirect("/usuario-ja-cadastrado");
-      } else {
-        // Não existe -> insere nova
-        db.run(query2, [titulo, conteudo, ativo], function (err) {
-          if (err) throw err;
-
-          console.log(`Campanha ${titulo} cadastrada com sucesso`);
-          res.redirect("/usuario-cadastrado");
-        });
-      }
+      console.log(`Campanha ${titulo} cadastrada com sucesso`);
+      res.redirect("/Campanhas");
     });
-  } else {
-    res.redirect("/nao-autorizado");
-  };
+  });
 });
 
 app.post("/cadastro", (req, res) => {
