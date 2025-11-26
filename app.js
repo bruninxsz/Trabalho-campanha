@@ -107,6 +107,30 @@ app.get("/", (req, res) => {
   res.render("pages/index", { titulo: "Index", req: req });
 });
 
+app.get("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("GET /criacao_Pontuacao_Itens");
+  res.render("pages/criacao_Pontuacao_Itens", { titulo: "criacao_Pontuacao_Itens", req: req });
+});
+
+app.get("/campanhas_ativas", (req, res) => {
+  console.log("GET /campanhas_ativas");
+
+  const query = "SELECT * FROM Campanhas WHERE ativo = 1";
+
+  db.all(query, [], (err, campanhas) => {
+    if (err) {
+      console.error("Erro ao buscar campanhas:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+
+    // >>> Aqui PASSAMOS o titulo e também selectCampanhas
+    res.render("pages/campanhas_ativas", {
+      titulo: "Campanhas Ativas",
+      req: req,
+      selectCampanhas: campanhas
+    });
+  });
+});
 
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
@@ -117,7 +141,7 @@ app.get("/nova-arrecadacao", (req, res) => {
  if (req.session.adm) {
     console.log("GET /nova-arrecadacao");
 const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Roupas";
+const query2 = "SELECT * FROM Pontuacao_Itens";
 
 // Primeiro obtemos os dados de ambas as tabelas
 db.all(query, [], (err, turmas) => {
@@ -146,19 +170,24 @@ app.post("/nova-arrecadacao", (req, res) => {
   // Pegar dados da postagem: User ID, Titulo, Conteudo, Data da Postagem
   //req.session.username, req.session.id
   if (req.session.adm) {
-    const {id_turma, id_roupa, qtd } = req.body;
-    const query = `INSERT INTO Arrecadacoes (id_turma, id_roupa, qtd, data) VALUES (?, ? , ?, ?)`;
-    const data = new Date();
-    const data_atual = data.toLocaleDateString();
-    console.log(JSON.stringify(req.body));
-    console.log(JSON.stringify(data_atual));
+    const { id_turma, id_Item, qtd } = req.body;
 
-    db.get(query, [id_turma ,id_roupa, qtd, data_atual], (err, row) => {
-      if (err) throw err; //SE OCORRER O ERRO VÁ PARA O RESTO DO CÓDIGO
-      //1. Verificar se o usuário existe
-      console.log(JSON.stringify(row));
-      res.redirect("/nova-arrecadacao")
-    });
+const query = `
+  INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data)
+  VALUES (?, ?, ?, ?)
+`;
+
+const data_atual = new Date().toLocaleDateString();
+
+db.run(query, [id_turma, id_Item, qtd, data_atual], function (err) {
+  if (err) {
+    console.error("Erro ao inserir arrecadação:", err);
+    return res.status(500).send("Erro no servidor");
+  }
+
+  console.log("Arrecadação inserida! ID:", this.lastID);
+  res.redirect("/nova-arrecadacao");
+});
 
   } else {
     res.redirect("/nao-autorizado");
@@ -264,7 +293,7 @@ app.post("/criacao_campanha", (req, res) => {
     const diasFaltando = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     const query1 = `SELECT * FROM Campanhas WHERE titulo=?`;
-    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando) VALUES (? , ?, ?, ?)`;
+    const query2 = `INSERT INTO Campanhas (titulo, conteudo, ativo, data_inicio, data_termino, diasFaltando) VALUES (?, ?, ?, ?, ?, ?)`;
     const ativo = 1;
     // Consulta se a campanha já existe
     db.get(query1, [titulo], (err, row) => {
@@ -342,9 +371,9 @@ app.get("/dashboard", (req, res) => {
       Turmas.docente,
       IFNULL(SUM(Pontuacao_Itens.pontos * Arrecadacoes.qtd), 0) AS pontos
     FROM Turmas
-    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_Item
-    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Roupa
-    GROUP BY Turmas.id_Item
+    LEFT JOIN Arrecadacoes ON Arrecadacoes.id_turma = Turmas.id_turma
+    LEFT JOIN Pontuacao_Itens ON Pontuacao_Itens.id = Arrecadacoes.id_Item
+    GROUP BY Turmas.id_turma
     ORDER BY pontos DESC;
   `;
 
