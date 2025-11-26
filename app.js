@@ -35,18 +35,13 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
-    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data TEXT)"
+    "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data INTEGER)"
   );
 
   db.run(
-    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
+    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, data INTEGER, ativo INTEGER)"
   );
  
-  db.run(
-    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, ativo INTEGER)"
-  );
-
-  
   db.serialize(() => {
   // Usuário administrador
  async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
