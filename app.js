@@ -36,7 +36,7 @@ db.serialize(() => {
   );
 
   db.run(
-    "CREATE TABLE IF NOT EXISTS Campanhas (id_Campanha INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, conteudo TEXT, diasFaltando INTEGER, data_termino INTEGER, data_inicio INTEGER, ativo INTEGER)"
+    "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
 );
 
   
