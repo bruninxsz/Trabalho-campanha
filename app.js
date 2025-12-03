@@ -14,17 +14,17 @@ app.use(cors({
   origin: "https://google.com.br",
   origin: "https://www.bing.com/"
 }))
-app.use(bodyParser.json({limit: "3mb"}))
+app.use(bodyParser.json({ limit: "3mb" }))
 
 const PORT = 8000;
 
 //Conexão com o Banco de Dados
 const db = new sqlite3.Database("users.db");
 db.serialize(() => {
-db.run(
+  db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
   )
-   db.run(
+  db.run(
     "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
   );
   db.run(
@@ -37,53 +37,53 @@ db.run(
 
   db.run(
     "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
-);
+  );
 
-  
+
   db.serialize(() => {
-  // Usuário administrador
- async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
-    return new Promise((resolve, reject) => {
+    // Usuário administrador
+    async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
+      return new Promise((resolve, reject) => {
         // Primeiro verifica se o usuário já existe
         db.get(
-            "SELECT id FROM users WHERE username = ?",
-            [username],
-            function (err, row) {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                
-                if (row) {
-                    console.log(`${tipo} já existe no banco de dados.`);
-                    resolve(false);
-                } else {
-                    // Se não existe, faz o insert
-                    db.run(
-                        "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
-                        [username, password, ativo, perfil],
-                        function (err) {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
-                                resolve(true);
-                            }
-                        }
-                    );
-                }
+          "SELECT id FROM users WHERE username = ?",
+          [username],
+          function (err, row) {
+            if (err) {
+              reject(err);
+              return;
             }
+
+            if (row) {
+              console.log(`${tipo} já existe no banco de dados.`);
+              resolve(false);
+            } else {
+              // Se não existe, faz o insert
+              db.run(
+                "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+                [username, password, ativo, perfil],
+                function (err) {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
+                    resolve(true);
+                  }
+                }
+              );
+            }
+          }
         );
-    });
-}
+      });
+    }
 
-// Uso
-inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
-    .catch(err => console.error("Erro:", err.message));
+    // Uso
+    inserirUsuarioSeNaoExistir("adm", "adm123", 1, "ADM", "Administrador")
+      .catch(err => console.error("Erro:", err.message));
 
-inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
-    .catch(err => console.error("Erro:", err.message));
-});  
+    inserirUsuarioSeNaoExistir("usuario", "usuario123", 1, "USR", "Usuário comum")
+      .catch(err => console.error("Erro:", err.message));
+  });
 });
 
 
@@ -113,24 +113,42 @@ app.get("/criacao_Pontuacao_Itens", (req, res) => {
 });
 
 app.get("/campanhas_ativas", (req, res) => {
-  console.log("GET /campanhas_ativas");
 
-  const query = "SELECT * FROM Campanhas WHERE ativo = 1";
+  let sql = "SELECT * FROM Campanhas";
 
-  db.all(query, [], (err, campanhas) => {
-    if (err) {
-      console.error("Erro ao buscar campanhas:", err);
-      return res.status(500).send("Erro no servidor");
+  db.all(sql, [], (erro, selectCampanhas) => {
+    if (erro) {
+      return res.send("Erro ao buscar campanhas.");
     }
 
-    // >>> Aqui PASSAMOS o titulo e também selectCampanhas
+    let agoraSegundos = Math.floor(Date.now() / 1000);
+    let umDia = 86400;
+
+    for (let i = 0; i < selectCampanhas.length; i++) {
+
+      let termino = selectCampanhas[i].data_termino;
+
+      if (!termino) {
+        selectCampanhas[i].diasFaltando = 0;
+        continue;
+      }
+
+      let diferenca = termino - agoraSegundos;
+      let dias = Math.floor(diferenca / umDia);
+
+      if (dias < 0) dias = 0;
+
+      selectCampanhas[i].diasFaltando = dias;
+    }
+
     res.render("pages/campanhas_ativas", {
-      titulo: "Campanhas Ativas",
+      selectCampanhas: selectCampanhas,
       req: req,
-      selectCampanhas: campanhas
+      titulo: "Campanhas Ativas"
     });
   });
 });
+
 
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
@@ -138,27 +156,27 @@ app.get("/sobre", (req, res) => {
 });
 
 app.get("/nova-arrecadacao", (req, res) => {
- if (req.session.adm) {
+  if (req.session.adm) {
     console.log("GET /nova-arrecadacao");
-const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Itens";
+    const query = "SELECT * FROM Turmas";
+    const query2 = "SELECT * FROM Pontuacao_Itens";
 
-// Primeiro obtemos os dados de ambas as tabelas
-db.all(query, [], (err, turmas) => {
-  if (err) throw err;
+    // Primeiro obtemos os dados de ambas as tabelas
+    db.all(query, [], (err, turmas) => {
+      if (err) throw err;
 
-  db.all(query2, [], (err, pontuacoes) => {
-    if (err) throw err;
+      db.all(query2, [], (err, pontuacoes) => {
+        if (err) throw err;
 
-    // Só renderizamos a página quando temos todos os dados
-    res.render("pages/nova-arrecadacao", {
-      titulo: "Nova Doação",
-      req: req,
-      turmas: turmas,
-      pontuacoes: pontuacoes
+        // Só renderizamos a página quando temos todos os dados
+        res.render("pages/nova-arrecadacao", {
+          titulo: "Nova Doação",
+          req: req,
+          turmas: turmas,
+          pontuacoes: pontuacoes
+        });
+      });
     });
-  });
-});
   } else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
@@ -172,22 +190,22 @@ app.post("/nova-arrecadacao", (req, res) => {
   if (req.session.adm) {
     const { id_turma, id_Item, qtd } = req.body;
 
-const query = `
+    const query = `
   INSERT INTO Arrecadacoes (id_turma, id_Item, qtd, data)
   VALUES (?, ?, ?, ?)
 `;
 
-const data_atual = new Date().toLocaleDateString();
+    const data_atual = new Date().toLocaleDateString();
 
-db.run(query, [id_turma, id_Item, qtd, data_atual], function (err) {
-  if (err) {
-    console.error("Erro ao inserir arrecadação:", err);
-    return res.status(500).send("Erro no servidor");
-  }
+    db.run(query, [id_turma, id_Item, qtd, data_atual], function (err) {
+      if (err) {
+        console.error("Erro ao inserir arrecadação:", err);
+        return res.status(500).send("Erro no servidor");
+      }
 
-  console.log("Arrecadação inserida! ID:", this.lastID);
-  res.redirect("/nova-arrecadacao");
-});
+      console.log("Arrecadação inserida! ID:", this.lastID);
+      res.redirect("/nova-arrecadacao");
+    });
 
   } else {
     res.redirect("/nao-autorizado");
@@ -208,7 +226,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("POST /login");
   console.log(JSON.stringify(req.body));
-  const { username, password, perfil} = req.body;
+  const { username, password, perfil } = req.body;
 
   const query = `SELECT * FROM users WHERE username=? AND password=?`;
 
@@ -223,13 +241,13 @@ app.post("/login", (req, res) => {
       req.session.perfil = perfil;
       req.session.loggedin = true;
       req.session.id_username = row.id;
-      if(row.perfil == "ADM"){
-      req.session.adm = true;
-      res.redirect("/dashboard");
+      if (row.perfil == "ADM") {
+        req.session.adm = true;
+        res.redirect("/dashboard");
       }
-      else{
-      req.session.adm = false;
-      res.redirect("/");
+      else {
+        req.session.adm = false;
+        res.redirect("/");
       }
     } else {
       //3. Se não, executar processo de negação de login
@@ -251,27 +269,27 @@ app.get("/cadastro", (req, res) => {
 });
 
 app.get("/criacao_campanha", (req, res) => {
- if (req.session.adm) {
+  if (req.session.adm) {
     console.log("GET /criacao_campanha");
-const query = "SELECT * FROM Turmas";
-const query2 = "SELECT * FROM Pontuacao_Itens";
+    const query = "SELECT * FROM Turmas";
+    const query2 = "SELECT * FROM Pontuacao_Itens";
 
-// Primeiro obtemos os dados de ambas as tabelas
-db.all(query, [], (err, turmas) => {
-  if (err) throw err;
+    // Primeiro obtemos os dados de ambas as tabelas
+    db.all(query, [], (err, turmas) => {
+      if (err) throw err;
 
-  db.all(query2, [], (err, pontuacoes) => {
-    if (err) throw err;
+      db.all(query2, [], (err, pontuacoes) => {
+        if (err) throw err;
 
-    // Só renderizamos a página quando temos todos os dados
-    res.render("pages/criacao_campanha", {
-      titulo: "Nova Doação",
-      req: req,
-      turmas: turmas,
-      pontuacoes: pontuacoes
+        // Só renderizamos a página quando temos todos os dados
+        res.render("pages/criacao_campanha", {
+          titulo: "Nova Doação",
+          req: req,
+          turmas: turmas,
+          pontuacoes: pontuacoes
+        });
+      });
     });
-  });
-});
   } else {
     tituloError = "Não Autorizado";
     res.redirect("/nao-autorizado");
@@ -319,132 +337,135 @@ app.post("/criacao_campanha", (req, res) => {
 });
 
 app.get("/campanhas/ativas/:id", (req, res) => {
-    let idCampanha = req.params.id;
+  let idCampanha = req.params.id;
 
-    let sql = "SELECT * FROM campanhas WHERE id_Campanha = ?";
-    db.get(sql, [idCampanha], (erro, linha) => {
-        if (erro) {
-            console.log("Erro ao buscar campanha:", erro);
-            return res.send("Erro no servidor");
-        }
+  let sql = "SELECT * FROM campanhas WHERE id_Campanha = ?";
+  db.get(sql, [idCampanha], (erro, linha) => {
+    if (erro) {
+      console.log("Erro ao buscar campanha:", erro);
+      return res.send("Erro no servidor");
+    }
 
-        if (!linha) {
-            return res.send("Campanha não encontrada");
-        }
+    if (!linha) {
+      return res.send("Campanha não encontrada");
+    }
 
-        // Cálculo dos dias faltando
-        let agora = Math.floor(Date.now() / 1000);
-        let diferenca = linha.data_termino - agora;
-        let dias = Math.ceil(diferenca / 86400);
+    // Cálculo dos dias faltando
+    let agora = Math.floor(Date.now() / 1000);
+    let diferenca = linha.data_termino - agora;
+    let dias = Math.ceil(diferenca / 86400);
 
-        linha.diasFaltando = dias;
+    linha.diasFaltando = dias;
 
-        res.render("pages/campanha_detalhe", { campanha: linha, titulo:"Editor de Campanhas",req:req });
-    });
+    res.render("pages/campanha_detalhe", { campanha: linha, titulo: "Editor de Campanhas", req: req });
+  });
 });
 
 app.post("/editar_campanha", (req, res) => {
-    let idCampanha = req.body.id_Campanha;
-    let titulo = req.body.titulo;
-    let conteudo = req.body.conteudo;
-    let inicio = req.body.inicio;
-    let termino = req.body.termino;
-    let ativo = req.body.ativo;
 
-    // Transformando datas em timestamp (iniciante)
-    let partesIni = inicio.split("-");
-    let anoIni = partesIni[0];
-    let mesIni = partesIni[1] - 1;
-    let diaIni = partesIni[2];
-    let timestampInicio = Math.floor(new Date(anoIni, mesIni, diaIni).getTime() / 1000);
+  let id = req.body.id_Campanha;
+  let titulo = req.body.titulo;
+  let conteudo = req.body.conteudo;
 
-    let partesFim = termino.split("-");
-    let anoFim = partesFim[0];
-    let mesFim = partesFim[1] - 1;
-    let diaFim = partesFim[2];
-    let timestampFim = Math.floor(new Date(anoFim, mesFim, diaFim).getTime() / 1000);
+  let inicioTexto = req.body.inicio;
+  let terminoTexto = req.body.termino;
 
-    let sql = `UPDATE campanhas 
-               SET titulo=?, conteudo=?, data_inicio=?, data_termino=?, ativo=? 
-               WHERE id_Campanha=?`;
+  let inicioData = new Date(inicioTexto + " 00:00:00");
+  let terminoData = new Date(terminoTexto + " 00:00:00");
 
-    db.run(sql, [titulo, conteudo, timestampInicio, timestampFim, ativo, idCampanha], function(err) {
-        if (err) {
-            console.log("Erro ao atualizar:", err);
-            return res.send("Erro ao salvar");
-        }
+  let inicioSegundos = Math.floor(inicioData.getTime() / 1000);
+  let terminoSegundos = Math.floor(terminoData.getTime() / 1000);
 
-        res.redirect("/campanhas_ativas");
+  let ativo = req.body.ativo;
+
+  let sql = "UPDATE campanhas SET titulo=?, conteudo=?, data_inicio=?, diasFaltando=?, ativo=? WHERE id_Campanha=?";
+
+  db.run(sql, [titulo, conteudo, inicioSegundos, terminoSegundos, ativo, id], (erro) => {
+    if (erro) {
+      return res.send("Erro ao editar campanha.");
+    }
+
+    res.redirect("/campanhas_ativas");
+  });
+});
+
+app.get("/editar_campanha/:id", (req, res) => {
+
+  let id_Campanha = req.params.id;
+  let sql = "SELECT * FROM Campanhas WHERE id_Campanha = ?";
+
+  db.get(sql, [id_Campanha], (erro, campanha) => {
+    if (erro || !campanha) {
+      return res.send("Campanha não encontrada.");
+    }
+
+    let dataIni = new Date(campanha.data_inicio * 1000);
+    let ano1 = dataIni.getFullYear();
+    let mes1 = dataIni.getMonth() + 1;
+    let dia1 = dataIni.getDate();
+    if (mes1 < 10) mes1 = "0" + mes1;
+    if (dia1 < 10) dia1 = "0" + dia1;
+    let inicioFmt = ano1 + "-" + mes1 + "-" + dia1;
+
+    let dataFim = new Date(campanha.data_termino * 1000);
+    let ano2 = dataFim.getFullYear();
+    let mes2 = dataFim.getMonth() + 1;
+    let dia2 = dataFim.getDate();
+    if (mes2 < 10) mes2 = "0" + mes2;
+    if (dia2 < 10) dia2 = "0" + dia2;
+    let terminoFmt = ano2 + "-" + mes2 + "-" + dia2;
+
+    res.render("pages/editar_campanha", {
+      campanha: campanha,
+      inicioFmt: inicioFmt,
+      terminoFmt: terminoFmt,
+      titulo: "Editar Campanhas",
+      req:req
     });
+  });
 });
 
 
-app.get("/editar_campanha/:id_Campanha", (req, res) => {
-    let idCampanha = req.params.id_Campanha;
 
-    let sql = "SELECT * FROM campanhas WHERE id_Campanha = ?";
+app.post("/editar_campanha/:id", (req, res) => {
 
-    db.get(sql, [idCampanha], (erro, campanhaUnica) => {
-        if (erro || !campanhaUnica) {
-            return res.send("Campanha não encontrada.");
-        }
+  let id_Campanha = req.params.id;
+  let titulo = req.body.titulo;
+  let conteudo = req.body.conteudo;
 
-        // transformar timestamps em yyyy-mm-dd (iniciante)
-        let dataIni = new Date(campanhaUnica.data_inicio * 1000);
-        let ano1 = dataIni.getFullYear();
-        let mes1 = dataIni.getMonth() + 1;
-        let dia1 = dataIni.getDate();
-        if (mes1 < 10) mes1 = "0" + mes1;
-        if (dia1 < 10) dia1 = "0" + dia1;
-        let inicioFmt = ano1 + "-" + mes1 + "-" + dia1;
+  let inicioTexto = req.body.data_inicio;
+  let terminoTexto = req.body.data_termino;
 
-        let dataTerm = new Date(campanhaUnica.data_termino * 1000);
-        let ano2 = dataTerm.getFullYear();
-        let mes2 = dataTerm.getMonth() + 1;
-        let dia2 = dataTerm.getDate();
-        if (mes2 < 10) mes2 = "0" + mes2;
-        if (dia2 < 10) dia2 = "0" + dia2;
-        let terminoFmt = ano2 + "-" + mes2 + "-" + dia2;
+  // Transformando texto de data em partes
+  let partesIni = inicioTexto.split("-");
+  let partesFim = terminoTexto.split("-");
 
-        res.render("pages/editar_campanha", {
-            campanha: campanhaUnica,
-            inicioFmt: inicioFmt,
-            terminoFmt: terminoFmt,
-            titulo:"Editor de Campanhas",
-            req:req
-        });
-    });
+  let dataIni = new Date(partesIni[0], partesIni[1] - 1, partesIni[2], 0, 0, 0);
+  let dataFim = new Date(partesFim[0], partesFim[1] - 1, partesFim[2], 0, 0, 0);
+
+  let inicioSeg = Math.floor(dataIni.getTime() / 1000);
+  let fimSeg = Math.floor(dataFim.getTime() / 1000);
+
+  // VALIDAÇÃO: início > término
+  if (inicioSeg > fimSeg) {
+    return res.send("Erro: a data de início não pode ser maior que a data de término.");
+  }
+
+  let sql = `
+    UPDATE Campanhas 
+    SET titulo = ?, conteudo = ?, data_inicio = ?, data_termino = ?
+    WHERE id_Campanha = ?
+  `;
+
+  db.run(sql, [titulo, conteudo, inicioSeg, fimSeg, id_Campanha], (erro) => {
+    if (erro) {
+      return res.send("Erro ao editar campanha.");
+    }
+
+    res.redirect("/campanhas_ativas");
+  });
 });
 
-app.post("/editar_campanha/:id_Campanha", (req, res) => {
-    let idCampanha = req.params.id_Campanha;
-
-    let titulo = req.body.titulo;
-    let conteudo = req.body.conteudo;
-    let dataInicio = req.body.data_inicio;
-    let dataTermino = req.body.data_termino;
-
-    let anoIni = dataInicio.substring(0, 4);
-    let mesIni = dataInicio.substring(5, 7);
-    let diaIni = dataInicio.substring(8, 10);
-
-    let anoFim = dataTermino.substring(0, 4);
-    let mesFim = dataTermino.substring(5, 7);
-    let diaFim = dataTermino.substring(8, 10);
-
-    let tsInicio = Math.floor(new Date(anoIni + "-" + mesIni + "-" + diaIni).getTime() / 1000);
-    let tsFim = Math.floor(new Date(anoFim + "-" + mesFim + "-" + diaFim).getTime() / 1000);
-
-    let sql = "UPDATE campanhas SET titulo=?, conteudo=?, data_inicio=?, data_termino=? WHERE id_Campanha=?";
-
-    db.run(sql, [titulo, conteudo, tsInicio, tsFim, idCampanha], (erro) => {
-        if (erro) {
-            return res.send("Erro ao atualizar campanha.");
-        }
-
-        res.redirect("/campanhas_ativas");
-    });
-});
 
 app.post("/cadastro", (req, res) => {
   console.log("POST /cadastro");
@@ -489,8 +510,8 @@ app.get("/usuario-ja-cadastrado", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  if(req.session.loggedin){
-  const query = `
+  if (req.session.loggedin) {
+    const query = `
     SELECT
       Turmas.id_turma,
       Turmas.sigla,
@@ -503,21 +524,22 @@ app.get("/dashboard", (req, res) => {
     ORDER BY pontos DESC;
   `;
 
-  db.all(query, [], (err, resultado) => {
-    if (err) {
-      console.error("Erro no banco:", err);
-      return res.status(500).send("Erro no servidor");
-    }
+    db.all(query, [], (err, resultado) => {
+      if (err) {
+        console.error("Erro no banco:", err);
+        return res.status(500).send("Erro no servidor");
+      }
 
-    res.render("pages/dashboard", {
-      titulo: "Dashboard",
-      selectTurmas: resultado,
-      req: req
+      res.render("pages/dashboard", {
+        titulo: "Dashboard",
+        selectTurmas: resultado,
+        req: req
+      });
     });
-  });
-}else {
-  res.redirect("/nao-permitido")
-}});
+  } else {
+    res.redirect("/nao-permitido")
+  }
+});
 
 app.get("/nao-permitido", (req, res) => {
   console.log("GET /nao-permitido");
@@ -539,8 +561,8 @@ app.get("/logout", (req, res) => {
 app.use("/{*erro}", (req, res) => {
   // Envia uma resposta de erro 404
   res
-  .status(404)
-  .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
+    .status(404)
+    .render("pages/fail", { titulo: "ERRO 404", req: req, msg: "404" });
 });
 
 app.listen(PORT, () => {
