@@ -318,6 +318,134 @@ app.post("/criacao_campanha", (req, res) => {
   });
 });
 
+app.get("/campanhas/ativas/:id", (req, res) => {
+    let idCampanha = req.params.id;
+
+    let sql = "SELECT * FROM campanhas WHERE id_Campanha = ?";
+    db.get(sql, [idCampanha], (erro, linha) => {
+        if (erro) {
+            console.log("Erro ao buscar campanha:", erro);
+            return res.send("Erro no servidor");
+        }
+
+        if (!linha) {
+            return res.send("Campanha não encontrada");
+        }
+
+        // Cálculo dos dias faltando
+        let agora = Math.floor(Date.now() / 1000);
+        let diferenca = linha.data_termino - agora;
+        let dias = Math.ceil(diferenca / 86400);
+
+        linha.diasFaltando = dias;
+
+        res.render("pages/campanha_detalhe", { campanha: linha, titulo:"Editor de Campanhas",req:req });
+    });
+});
+
+app.post("/editar_campanha", (req, res) => {
+    let idCampanha = req.body.id_Campanha;
+    let titulo = req.body.titulo;
+    let conteudo = req.body.conteudo;
+    let inicio = req.body.inicio;
+    let termino = req.body.termino;
+    let ativo = req.body.ativo;
+
+    // Transformando datas em timestamp (iniciante)
+    let partesIni = inicio.split("-");
+    let anoIni = partesIni[0];
+    let mesIni = partesIni[1] - 1;
+    let diaIni = partesIni[2];
+    let timestampInicio = Math.floor(new Date(anoIni, mesIni, diaIni).getTime() / 1000);
+
+    let partesFim = termino.split("-");
+    let anoFim = partesFim[0];
+    let mesFim = partesFim[1] - 1;
+    let diaFim = partesFim[2];
+    let timestampFim = Math.floor(new Date(anoFim, mesFim, diaFim).getTime() / 1000);
+
+    let sql = `UPDATE campanhas 
+               SET titulo=?, conteudo=?, data_inicio=?, data_termino=?, ativo=? 
+               WHERE id_Campanha=?`;
+
+    db.run(sql, [titulo, conteudo, timestampInicio, timestampFim, ativo, idCampanha], function(err) {
+        if (err) {
+            console.log("Erro ao atualizar:", err);
+            return res.send("Erro ao salvar");
+        }
+
+        res.redirect("/campanhas_ativas");
+    });
+});
+
+
+app.get("/editar_campanha/:id_Campanha", (req, res) => {
+    let idCampanha = req.params.id_Campanha;
+
+    let sql = "SELECT * FROM campanhas WHERE id_Campanha = ?";
+
+    db.get(sql, [idCampanha], (erro, campanhaUnica) => {
+        if (erro || !campanhaUnica) {
+            return res.send("Campanha não encontrada.");
+        }
+
+        // transformar timestamps em yyyy-mm-dd (iniciante)
+        let dataIni = new Date(campanhaUnica.data_inicio * 1000);
+        let ano1 = dataIni.getFullYear();
+        let mes1 = dataIni.getMonth() + 1;
+        let dia1 = dataIni.getDate();
+        if (mes1 < 10) mes1 = "0" + mes1;
+        if (dia1 < 10) dia1 = "0" + dia1;
+        let inicioFmt = ano1 + "-" + mes1 + "-" + dia1;
+
+        let dataTerm = new Date(campanhaUnica.data_termino * 1000);
+        let ano2 = dataTerm.getFullYear();
+        let mes2 = dataTerm.getMonth() + 1;
+        let dia2 = dataTerm.getDate();
+        if (mes2 < 10) mes2 = "0" + mes2;
+        if (dia2 < 10) dia2 = "0" + dia2;
+        let terminoFmt = ano2 + "-" + mes2 + "-" + dia2;
+
+        res.render("pages/editar_campanha", {
+            campanha: campanhaUnica,
+            inicioFmt: inicioFmt,
+            terminoFmt: terminoFmt,
+            titulo:"Editor de Campanhas",
+            req:req
+        });
+    });
+});
+
+app.post("/editar_campanha/:id_Campanha", (req, res) => {
+    let idCampanha = req.params.id_Campanha;
+
+    let titulo = req.body.titulo;
+    let conteudo = req.body.conteudo;
+    let dataInicio = req.body.data_inicio;
+    let dataTermino = req.body.data_termino;
+
+    let anoIni = dataInicio.substring(0, 4);
+    let mesIni = dataInicio.substring(5, 7);
+    let diaIni = dataInicio.substring(8, 10);
+
+    let anoFim = dataTermino.substring(0, 4);
+    let mesFim = dataTermino.substring(5, 7);
+    let diaFim = dataTermino.substring(8, 10);
+
+    let tsInicio = Math.floor(new Date(anoIni + "-" + mesIni + "-" + diaIni).getTime() / 1000);
+    let tsFim = Math.floor(new Date(anoFim + "-" + mesFim + "-" + diaFim).getTime() / 1000);
+
+    let sql = "UPDATE campanhas SET titulo=?, conteudo=?, data_inicio=?, data_termino=? WHERE id_Campanha=?";
+
+    db.run(sql, [titulo, conteudo, tsInicio, tsFim, idCampanha], (erro) => {
+        if (erro) {
+            return res.send("Erro ao atualizar campanha.");
+        }
+
+        res.redirect("/campanhas_ativas");
+    });
+});
+
 app.post("/cadastro", (req, res) => {
   console.log("POST /cadastro");
   console.log(JSON.stringify(req.body));

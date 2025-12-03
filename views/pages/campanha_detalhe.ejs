@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<%- include("../partials/head") %>
+<%- include("../partials/menu") %>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Campanha</title>
+</head>
+
+<body>
+
+    <h1><%= campanha.titulo %></h1>
+
+    <p><strong>Conteúdo:</strong> <%= campanha.conteudo %></p>
+
+    <!-- DATA INÍCIO -->
+    <%
+        let d1 = new Date(campanha.data_inicio * 1000);
+        let ano1 = d1.getFullYear();
+        let mes1 = d1.getMonth() + 1;
+        let dia1 = d1.getDate();
+        if (mes1 < 10) mes1 = "0" + mes1;
+        if (dia1 < 10) dia1 = "0" + dia1;
+        let inicioMostrar = dia1 + "/" + mes1 + "/" + ano1;
+    %>
+    <p><strong>Início:</strong> <%= inicioMostrar %></p>
+
+    <!-- DATA TÉRMINO -->
+    <%
+        let d2 = new Date(campanha.data_termino * 1000);
+        let ano2 = d2.getFullYear();
+        let mes2 = d2.getMonth() + 1;
+        let dia2 = d2.getDate();
+        if (mes2 < 10) mes2 = "0" + mes2;
+        if (dia2 < 10) dia2 = "0" + dia2;
+        let terminoMostrar = dia2 + "/" + mes2 + "/" + ano2;
+    %>
+    <p><strong>Término:</strong> <%= terminoMostrar %></p>
+
+    <p><strong>Dias faltando:</strong> <%= campanha.diasFaltando %></p>
+
+    <a href="/campanhas_ativas">← Voltar</a>
+
+    <%- include("../partials/footer") %>
+</body>
+</html>

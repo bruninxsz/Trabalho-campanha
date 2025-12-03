@@ -6,10 +6,12 @@
       <th>Início</th>
       <th>Término</th>
       <th>Dias Faltando</th>
+      <th>Ação</th>
     </tr>
   </thead>
+
   <tbody>
-    <% for(let i = 0; i < selectCampanhas.length; i++) { %>
+    <% for (let i = 0; i < selectCampanhas.length; i++) { %>
       <tr>
         <td><%= selectCampanhas[i].titulo %></td>
         <td><%= selectCampanhas[i].conteudo %></td>
@@ -43,6 +45,12 @@
         </td>
 
         <td><%= selectCampanhas[i].diasFaltando %></td>
+
+        <!-- COLUNA DE AÇÃO COM O HREF -->
+        <td>
+          <a href="/editar_campanha/<%= selectCampanhas[i].id_Campanha %>">Editar</a>
+        </td>
+
       </tr>
     <% } %>
   </tbody>
