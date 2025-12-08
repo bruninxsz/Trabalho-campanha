@@ -3,195 +3,202 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif;
-  }
+}
 
-  body {
-    background: linear-gradient(to right #e5eaf5);
-    color: #ffffff;
+body {
+    background: linear-gradient(to right, #e5eaf5, #f5f7fa);
+    color: #333333; /* Alterado de #ffffff para #333333 */
     line-height: 1.6;
     min-height: 100vh;
-  }
-  
-  h1{
-    color:#8458B3;
-  }
-  header {
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #8458B3;
+}
+
+header {
     background-color: #d0bdf4;
     padding: 16px 32px;
-    color: white;
-    text-align: right;
+    color: #333333; /* Alterado de white para #333333 */
+    text-align: right;  
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  header a {
-    color: white;
+}
+
+header a {
+    color: #333333; /* Alterado de white para #333333 */
     text-decoration: none;
     font-weight: bold;
     margin-left: 15px;    
     transition: color 0.3s ease;
-  }
-  
-  header a:hover {
-    color: white;
-  }
-  
-  nav {
+}
+
+header a:hover {
+    color: #8458B3; /* Alterado de white para #8458B3 */
+}
+
+nav {
     background: transparent;
     padding: 15px 0;
     text-align: center;
-  }
-  
-  nav ul {
+}
+
+nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-  
-  nav ul li {
+}
+
+nav ul li {
     display: inline-block;
     margin: 0 25px;
     position: relative;
-  }
-  
-  nav ul li::after {
+}
+
+nav ul li::after {
     content: '';
     display: block;
     height: 2px;
     width: 0%;
-    background: white;
+    background: #8458B3; /* Alterado de white para #8458B3 */
     transition: width 0.3s;
     margin: 5px auto 0 auto;
-  }
-  
-  nav ul li:hover::after {
+}
+
+nav ul li:hover::after {
     width: 100%;
-  }
-  
-  nav ul li a {
+}
+
+nav ul li a {
     text-decoration: none;
-    color: white;
+    color: #333333; /* Alterado de white para #333333 */
     font-weight: bold;
     font-size: 1.1rem;
     transition: transform 0.2s, color 0.2s;
-  }
-  
-  nav ul li a:hover {
-    transform: scale(1.1);
-    color: white;
-  }
-  
+}
 
-  #h1Login {
+nav ul li a:hover {
+    transform: scale(1.1);
+    color: #8458B3; /* Alterado de white para #8458B3 */
+}
+
+#h1Login {
     font-size: 2.5rem;
     margin: 30px auto;
     text-align: center;
-    color: red;
-  }
-  
+    color: #8458B3; /* Alterado de red para #8458B3 */
+}
 
-  input, textarea {
+input, textarea, select {
     font-size: 16px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
     width: 200px;
     max-width: 100%;
-    color: #000000;
+    color: #000000 !important; /* Forçando cor preta */
+    background-color: #ffffff !important; /* Forçando fundo branco */
     outline: none;
     transition: border 0.3s ease;
     display: inline-block;
-  }
-  
+}
 
-  .tabela-doacao {
+input:focus, textarea:focus, select:focus {
+    border-color: #8458B3;
+    box-shadow: 0 0 5px rgba(132, 88, 179, 0.5);
+}
+
+.tabela-doacao {
     width: 25%;
     font-weight: bold;
     border-spacing: 0;
     border: 3px solid #8458B3; 
     border-radius: 10px;
-    background-color: #d0bdf4; 
-    color: white;
+    background-color: #ffffff; /* Alterado de #d0bdf4 para #ffffff */
+    color: #333333; /* Alterado de white para #333333 */
+}
 
-  }
-
-  .tabela-doacao th, .tabela-doacao td {
-  border: 2px solid #8458B3;
-  padding: 10px;
-  text-align: center;
+.tabela-doacao th, .tabela-doacao td {
+    border: 2px solid #8458B3;
+    padding: 10px;
+    text-align: center;
+    color: #333333; /* Adicionado para garantir cor do texto */
 }
 
 .tabela-doacao th {
-  text-align: center;
-  background-color: #8458B3;
-  font-weight: bold;
+    text-align: center;
+    background-color: #8458B3;
+    font-weight: bold;
+    color: white; /* Cabeçalho pode ficar branco */
 }
 
-  
-  
-  button {
+button {
     padding: 10px 20px;
     border: none;
-    background-color:#8458B3;
+    background-color: #8458B3;
     color: white;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s;
-  }
-  
-  button:hover {
-    background-color:#774ea2;
-    transform: scale(1.05);
-  }
-  
+}
 
-  footer {
+button:hover {
+    background-color: #774ea2;
+    transform: scale(1.05);
+}
+
+footer {
     position: sticky;
     top: 100vh;
     width: 100%;
-    background-color:#d0bdf4;
-    color: white;
+    background-color: #d0bdf4;
+    color: #333333; /* Alterado de white para #333333 */
     text-align: center;
     padding: 12px 0;
     font-size: 0.9rem;
-  }
-  
-  #MainDash * {
+}
+
+#MainDash * {
     border: 1px solid;
     width: 900px;
-  }
-  
-  #MainDash table {
+}
+
+#MainDash table {
     text-align: center;
     border: 3px solid;
-  }
-  
+    color: #333333; /* Adicionado para garantir cor do texto */
+}
 
-  a {
+a {
     font-size: large;
-  }
-  
-  .LogoCamp {
+    color: #8458B3 !important; /* Forçando cor para links */
+    text-decoration: none;
+}
+
+a:hover {
+    color: #774ea2 !important;
+}
+
+.LogoCamp {
     border-radius: 15%;
     transition: transform 0.3s ease;
     margin-left: auto;
     margin-right: auto;
     display: block;
-    
-  }
-  
-  .LogoCamp:hover {
-    transform: scale(1.1);
-  }
+}
 
-  .bloqueio{
+.LogoCamp:hover {
+    transform: scale(1.1);
+}
+
+.bloqueio {
     width: 300px;
     height: auto;
     background-color: transparent;
-  }
+}
 
-  #text {
+#text {
     max-width: 800px;
     margin: 30px auto;
     padding: 20px;
@@ -200,122 +207,146 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #ffff;
+    color: #333333; /* Alterado de #ffff para #333333 */
     text-align: justify;
-  }
-
-
-#h1Login {
-  font-size: 2.5rem;
-  margin: 40px auto 20px;
-  text-align: center;
-  color: #8458B3;
 }
 
-.h1arrec{
-    color:#000;
+.h1arrec {
+    color: #333333; /* Alterado de #000 para #333333 para consistência */
 }
 
 .formItens {
-  background-color: white;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  display: inline-block;
-  margin-top: 20px;
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: inline-block;
+    margin-top: 20px;
+    color: #333333; /* Adicionado para garantir cor do texto */
 }
 
-
 #tblLogin {
-  margin: 0 auto;
-  border-collapse: separate;
-  border-spacing: 10px 15px;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 10px 15px;
+    color: #333333; /* Adicionado para garantir cor do texto */
 }
 
 #tblLogin td {
-  font-size: 1rem;
-  color: #333;
+    font-size: 1rem;
+    color: #333333;
 }
 
 #tblLogin input {
-  width: 260px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  color: #000;
-  transition: border-color 0.3s;
+    width: 260px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    transition: border-color 0.3s;
 }
 
 #tblLogin input:focus {
-  border-color: #2a378e;
-  outline: none;
+    border-color: #2a378e;
+    outline: none;
 }
 
 #btnEntrar {
-  margin-top: 20px;
-  padding: 12px 30px;
-  background-color: #8458B3;
-  border: none;
-  color: white;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s;
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #8458B3;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 #btnEntrar:hover {
-  background-color: #714c99;
-
+    background-color: #714c99;
 }
 
 #cadastrar {
-  display: block;
-  text-align: center;
-  margin-top: 20px;
-  font-size: 1.2rem;
-  color: #000;
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #8458B3; /* Alterado de #000 para #8458B3 */
 }
 
 #cadastrar:hover {
-  color: #8458B3;
-  text-decoration: underline;
+    color: #774ea2;
+    text-decoration: underline;
 }
 
-.envio{
-  background-color: white;
-  padding: 60px 60px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  display: inline-block;
-  margin-top: 50px;
-  font-size: 1.3rem;
-  text-align:justify;
-
+.envio {
+    background-color: white;
+    padding: 60px 60px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: inline-block;
+    margin-top: 50px;
+    font-size: 1.3rem;
+    text-align: justify;
+    color: #333333; /* Adicionado para garantir cor do texto */
 }
 
 .novarrec {
-  margin-top: 20px;
-  margin-left:170px;
-  display: block;
-  padding: 10px 20px;
-  background-color: #8458B3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: 0.3s;
-  text-align: justify;
-
+    margin-top: 20px;
+    margin-left: 170px;
+    display: block;
+    padding: 10px 20px;
+    background-color: #8458B3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: justify;
 }
 
 .novarrec:hover {
-  background-color: #8458B3;
+    background-color: #774ea2; /* Alterado de #8458B3 para #774ea2 */
 }
 
-.Psobre{
-  background-color: #d0bdf4;
+.Psobre {
+    background-color: #d0bdf4;
+    color: #333333; /* Adicionado para garantir cor do texto */
 }
+
+/* ADICIONE ESTAS REGRAS PARA GARANTIR VISIBILIDADE */
+
+/* Garante que todo texto em parágrafos seja visível */
+p, span, div, label, td, th {
+    color: #333333 !important;
+}
+
+/* Garante que textos em formulários sejam visíveis */
+form, fieldset, legend {
+    color: #333333 !important;
+}
+
+/* Garante que tabelas tenham texto visível */
+table {
+    color: #333333 !important;
+}
+
+table th {
+    color: white !important; /* Cabeçalhos podem ficar brancos sobre fundo colorido */
+}
+
+table td {
+    color: #333333 !important;
+    background-color: #ffffff !important;
+}
+
+/* Corrige o gradiente do body */
+body {
+    background: linear-gradient(to right, #e5eaf5, #f5f7fa);
+  }
