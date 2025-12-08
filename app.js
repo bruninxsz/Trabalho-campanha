@@ -40,6 +40,7 @@ db.serialize(() => {
 
   db.run(
     "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
+<<<<<<< HEAD
   );
 
 // Inserir turmas apenas se não existirem
@@ -97,6 +98,45 @@ const insertOrIgnoreTurma = (sigla, docente) => {
           }
         });
       }
+=======
+);
+
+  
+  db.serialize(() => {
+  // Usuário administrador
+ async function inserirUsuarioSeNaoExistir(username, password, ativo, perfil, tipo) {
+    return new Promise((resolve, reject) => {
+        // Primeiro verifica se o usuário já existe
+        db.get(
+            "SELECT id FROM users WHERE username = ?",
+            [username],
+            function (err, row) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                
+                if (row) {
+                    console.log(`${tipo} já existe no banco de dados.`);
+                    resolve(false);
+                } else {
+                    // Se não existe, faz o insert
+                    db.run(
+                        "INSERT INTO users (username, password, ativo, perfil) VALUES (?, ?, ?, ?)",
+                        [username, password, ativo, perfil],
+                        function (err) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                console.log(`${tipo} inserido com sucesso! ID:`, this.lastID);
+                                resolve(true);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+>>>>>>> 9eb1b25dcf2f8e94cfd76e8815fa314449befd2a
     });
   });
 };
