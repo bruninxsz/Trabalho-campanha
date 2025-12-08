@@ -42,6 +42,7 @@ db.serialize(() => {
     "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
   );
 
+  
 // Inserir turmas apenas se não existirem
 const turmas = [
   ['M1A', 'WILLIAM'],
@@ -260,6 +261,40 @@ app.get("/campanhas_ativas", (req, res) => {
   });
 });
 
+app.get("/item-cadastrado", (req, res) => {
+  console.log("GET /item-cadastrado");
+  
+  const query = `
+    SELECT 
+      pi.id,
+      pi.Descricao,
+      pi.pontos,
+      pi.id_campanha,
+      c.titulo as nome_campanha
+    FROM Pontuacao_Itens pi
+    LEFT JOIN Campanhas c ON pi.id_campanha = c.id_Campanha
+    ORDER BY pi.id DESC
+  `;
+  
+  db.all(query, [], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar itens:", err);
+      return res.status(500).send("Erro no servidor");
+    }
+    
+    console.log(`Encontrados ${results.length} itens:`);
+    results.forEach(item => {
+      console.log(`- ID: ${item.id}, Descrição: ${item.Descricao}, Pontos: ${item.pontos}`);
+    });
+    
+    res.render("pages/item-cadastrado", { 
+      titulo: "Itens Cadastrados", 
+      itens: results,  
+      req: req 
+    });
+  });
+});
+
 
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
@@ -323,10 +358,7 @@ app.post("/nova-arrecadacao", (req, res) => {
   }
 });
 
-// Inicia o servidor
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
-});
+
 
 app.get("/login", (req, res) => {
   console.log("GET /login");
@@ -442,7 +474,7 @@ app.post("/criacao_campanha", (req, res) => {
       if (err) throw err;
 
       console.log(`Campanha ${titulo} cadastrada com sucesso`);
-      res.redirect("/Campanhas");
+      res.redirect("/campanhas_ativas");
     });
   });
 });
