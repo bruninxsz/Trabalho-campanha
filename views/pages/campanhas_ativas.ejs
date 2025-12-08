@@ -9,71 +9,74 @@
 </head>
 
 <body>
-
+<center>
   <h1>Campanhas Ativas</h1>
-
-<table class="tabela-doacao">
-  <thead>
-    <tr>
-      <th>Título</th>
-      <th>Conteúdo</th>
-      <th>Início</th>
-      <th>Término</th>
-      <th>Dias Faltando</th>
-      <th>Ação</th>
-    </tr>
-  </thead>
-
-  <tbody>
-
-    <% for (let i = 0; i < selectCampanhas.length; i++) { %>
-
+<br>
+  <table class="tabela-doacao">
+    <thead>
       <tr>
-        <td><%= selectCampanhas[i].titulo %></td>
-        <td><%= selectCampanhas[i].conteudo %></td>
-
-        <!-- INÍCIO -->
-        <td>
-          <% 
-            let dataIni = new Date(selectCampanhas[i].data_inicio * 1000);
-            let ano1 = dataIni.getFullYear();
-            let mes1 = dataIni.getMonth() + 1;
-            let dia1 = dataIni.getDate();
-            if (mes1 < 10) mes1 = "0" + mes1;
-            if (dia1 < 10) dia1 = "0" + dia1;
-            let inicioFmt = ano1 + "-" + mes1 + "-" + dia1;
-          %>
-          <%= inicioFmt %>
-        </td>
-
-        <!-- TÉRMINO -->
-        <td>
-          <% 
-            let dataFim = new Date(selectCampanhas[i].data_termino * 1000);
-            let ano2 = dataFim.getFullYear();
-            let mes2 = dataFim.getMonth() + 1;
-            let dia2 = dataFim.getDate();
-            if (mes2 < 10) mes2 = "0" + mes2;
-            if (dia2 < 10) dia2 = "0" + dia2;
-            let terminoFmt = ano2 + "-" + mes2 + "-" + dia2;
-          %>
-          <%= terminoFmt %>
-        </td>
-
-        <!-- DIAS RESTANTES -->
-        <td><%= selectCampanhas[i].diasFaltando %></td>
-
-        <!-- LINK EDITAR -->
-        <td>
-          <a href="/editar_campanha/<%= selectCampanhas[i].id_Campanha %>">Editar</a>
-        </td>
+        <th>ID</th> <!-- NOVA COLUNA -->
+        <th>Título</th>
+        <th>Conteúdo</th>
+        <th>Início</th>
+        <th>Término</th>
+        <th>Dias Faltando</th>
+        <th>Ação</th>
       </tr>
+    </thead>
 
-    <% } %>
+    <tbody>
+      <% for (let i = 0; i < selectCampanhas.length; i++) { %>
+        <tr>
+          <td><%= selectCampanhas[i].id_Campanha %></td> <!-- NOVA COLUNA -->
+          <td><%= selectCampanhas[i].titulo %></td>
+          <td><%= selectCampanhas[i].conteudo %></td>
 
-  </tbody>
-</table>
+          <!-- INÍCIO DA CAMPANHA -->
+          <td>
+            <% 
+              let dataIni = new Date(selectCampanhas[i].data_inicio * 1000);
+              let ano1 = dataIni.getFullYear();
+              let mes1 = dataIni.getMonth() + 1;
+              let dia1 = dataIni.getDate();
+              if (mes1 < 10) mes1 = "0" + mes1;
+              if (dia1 < 10) dia1 = "0" + dia1;
+              let inicioFmt = ano1 + "-" + mes1 + "-" + dia1;
+            %>
+            <%= inicioFmt %>
+          </td>
 
-<%- include("../partials/footer") %>
+          <!-- TÉRMINO DA CAMPANHA -->
+          <td>
+            <% 
+              let dataTerm = new Date(selectCampanhas[i].data_termino * 1000);
+              let ano2 = dataTerm.getFullYear();
+              let mes2 = dataTerm.getMonth() + 1;
+              let dia2 = dataTerm.getDate();
+              if (mes2 < 10) mes2 = "0" + mes2;
+              if (dia2 < 10) dia2 = "0" + dia2;
+              let terminoFmt = ano2 + "-" + mes2 + "-" + dia2;
+            %>
+            <%= terminoFmt %>
+          </td>
+
+          <td><%= selectCampanhas[i].diasFaltando %></td>
+
+          <!-- COLUNA DE AÇÃO COM O HREF -->
+          <td>
+            <a href="/editar_campanha/<%= selectCampanhas[i].id_Campanha %>">Editar</a>
+          </td>
+
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</center>
+  <br><br>
+  <a href="/criacao_campanha">Criar Nova Campanha</a>
+  &nbsp;|&nbsp;
+  <a href="/dashboard">Voltar ao Dashboard</a>
+
+  <%- include("../partials/footer") %>
 </body>
 </html>

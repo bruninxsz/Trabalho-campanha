@@ -2,8 +2,10 @@
 <html>
 <%- include("../partials/head") %>
 <%- include("../partials/menu") %>
+<center>
 <head>
     <title>Cadastrar Item</title>
+    <br>
     <meta charset="UTF-8">
     <style>
         body {
@@ -34,6 +36,7 @@
 </head>
 <body>
     <h2>Cadastrar Novo Item</h2>
+    <br>
     <form action="/criacao_Pontuacao_Itens" method="POST">
         <label>Descrição:</label>
         <input type="text" name="Descricao" placeholder="Digite a descrição" required>
@@ -49,5 +52,6 @@
     <br>
     <a href="/item-cadastrado">Ver itens cadastrados</a>
 </body>
+</center>
 <%- include("../partials/footer") %>
 </html>
