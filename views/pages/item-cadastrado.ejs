@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<%- include("../partials/head") %>
+<%- include("../partials/menu") %>
+<head>
+    <title>Itens Cadastrados</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Itens Cadastrados</h2>
+    
+    <% if (itens && itens.length > 0) { %>
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Pontos</th>
+                    <th>Campanha</th>
+                    <th>ID Campanha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% itens.forEach(function(item) { %>
+                <tr>
+                    <td><%= item.id %></td>
+                    <td><%= item.Descricao %></td>
+                    <td><%= item.pontos %></td>
+                    <td><%= item.nome_campanha || 'Sem campanha' %></td>
+                    <td><%= item.id_campanha %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>Nenhum item cadastrado ainda.</p>
+    <% } %>
+    
+    <br><br>
+    <a href="/criacao_Pontuacao_Itens">Cadastrar Novo Item</a>
+    &nbsp;|&nbsp;
+    <a href="/dashboard">Voltar ao Dashboard</a>
+</body>
+<%- include("../partials/footer") %>
+</html>

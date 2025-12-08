@@ -24,9 +24,12 @@ db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, ativo INTGER, perfil TEXT(3))"
   )
-  db.run(
-    "CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT, docente TEXT)"
-  );
+  db.run(`
+  CREATE TABLE IF NOT EXISTS Turmas (id_turma INTEGER PRIMARY KEY AUTOINCREMENT, sigla TEXT UNIQUE, docente TEXT)`
+);
+
+  db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_turmas_sigla ON Turmas(sigla)`);
+
   db.run(
     "CREATE TABLE IF NOT EXISTS Arrecadacoes (id_arrecadacao INTEGER PRIMARY KEY AUTOINCREMENT, id_turma INTEGER, id_Item INTEGER, id_Campanha INTEGER, qtd INTEGER, data INTEGER)"
   );
@@ -38,6 +41,80 @@ db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS Pontuacao_Itens (id INTEGER PRIMARY KEY AUTOINCREMENT, Descricao TEXT, id_campanha INTEGER, pontos INTEGER)"
   );
+
+// Inserir turmas apenas se não existirem
+const turmas = [
+  ['M1A', 'WILLIAM'],
+  ['M3A', 'FABIO'],
+  ['M3B', 'EPAMINONDAS'],
+  ['M1C', 'ROGÉRIO POLETO'],
+  ['M3D', 'WALDEMAR'],
+  ['M1F', 'ALCINDO'],
+  ['M1I', 'BRUNA'],
+  ['M1IA', 'LUCAS / GABRIELA'],
+  ['M1H', 'IZAIAS'],
+  ['T1A', 'LUCIANO'],
+  ['T1B', 'DENIS'],
+  ['T1C', 'ROGÉRIO POLETO'],
+  ['T1D', 'WALDEMAR'],
+  ['T1IA', 'MARILIA'],
+  ['T1I', 'LUCAS / JOSÉ AUGUSTO'],
+  ['T3FA', 'ALEX'],
+  ['T2FC', 'FERNANDO'],
+  ['T3F', 'VITOR'],
+  ['T1FB', 'BRUNO'],
+  ['T1F', 'SERGIO'],
+  ['T1FA', 'ALEX PENTEADO'],
+  ['T1HS', 'MAYCON'],
+  ['T1HSB', 'RICARDO'],
+  ['T1E', 'JOÃO FLAVIO'],
+  ['T2HS', 'ANA'],
+  ['N1I', 'MARILIA'],
+  ['N3F', 'EVANDRO'],
+  ['N5F', 'PAULO']
+];
+
+const insertOrIgnoreTurma = (sigla, docente) => {
+  return new Promise((resolve, reject) => {
+    // Primeiro verifica se já existe
+    db.get("SELECT sigla FROM Turmas WHERE sigla = ?", [sigla], (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      
+      if (row) {
+        console.log(`Turma ${sigla} já existe, ignorando inserção.`);
+        resolve(false);
+      } else {
+        // Se não existe, insere
+        db.run("INSERT INTO Turmas (sigla, docente) VALUES (?, ?)", [sigla, docente], function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            console.log(`Turma ${sigla} inserida com sucesso! ID: ${this.lastID}`);
+            resolve(true);
+          }
+        });
+      }
+    });
+  });
+};
+
+// Inserir turmas uma por uma
+async function inserirTurmas() {
+  for (const turma of turmas) {
+    try {
+      await insertOrIgnoreTurma(turma[0], turma[1]);
+    } catch (err) {
+      console.error(`Erro ao processar turma ${turma[0]}:`, err.message);
+    }
+  }
+  console.log("Processamento de turmas concluído.");
+}
+
+// Chama a função para inserir turmas
+inserirTurmas();
 
 
   db.serialize(() => {
@@ -107,10 +184,44 @@ app.get("/", (req, res) => {
   res.render("pages/index", { titulo: "Index", req: req });
 });
 
+
 app.get("/criacao_Pontuacao_Itens", (req, res) => {
   console.log("GET /criacao_Pontuacao_Itens");
   res.render("pages/criacao_Pontuacao_Itens", { titulo: "criacao_Pontuacao_Itens", req: req });
 });
+
+app.post("/criacao_Pontuacao_Itens", (req, res) => {
+  console.log("POST /criacao_Pontuacao_Itens");
+  
+  // Verificar se o usuário está logado como administrador
+  if (!req.session.adm) {
+    return res.redirect("/nao-autorizado");
+  }
+  
+  const { Descricao, pontos, id_campanha } = req.body;
+  
+  // Validação básica dos dados
+  if (!Descricao || !pontos || !id_campanha) {
+    return res.send("Todos os campos são obrigatórios.");
+  }
+  
+  const query = `
+    INSERT INTO Pontuacao_Itens (Descricao, id_campanha, pontos)
+    VALUES (?, ?, ?)
+  `;
+  
+  db.run(query, [Descricao, id_campanha, pontos], function(err) {
+    if (err) {
+      console.error("Erro ao cadastrar item:", err);
+      return res.status(500).send("Erro ao cadastrar item no banco de dados.");
+    }
+    
+    console.log("Item cadastrado com sucesso! ID:", this.lastID);
+    res.redirect("/item-cadastrado"); // Redireciona para a página de itens cadastrados
+  });
+});
+
+
 
 app.get("/campanhas_ativas", (req, res) => {
 
